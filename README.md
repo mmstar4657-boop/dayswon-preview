@@ -1,2 +1,3 @@
-# dayswon-preview
-Days Won preview
+# Days Won
+
+Preview of the Days Won website.

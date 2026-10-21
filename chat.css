@@ -1,0 +1,73 @@
+/* DaysWon chat assistant */
+.nxc-launch{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;align-items:center;gap:10px;height:56px;padding:0 20px 0 16px;border-radius:999px;border:1px solid #a6a6ff55;background:linear-gradient(110deg,#7a55f5,#4f86f7);color:#fff;font:600 14px/1 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;box-shadow:0 14px 34px #05091acc,0 0 0 1px #ffffff10 inset;cursor:pointer;transition:transform .2s,filter .2s,opacity .2s}
+.nxc-launch:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.nxc-launch svg{width:22px;height:22px;flex:none}
+.nxc-launch .nxc-dot{position:absolute;top:9px;left:33px;width:9px;height:9px;border-radius:50%;background:#4ade80;border:2px solid #6a63f6}
+.nxc-open .nxc-launch{opacity:0;pointer-events:none;transform:scale(.9)}
+.nxc-panel{position:fixed;right:20px;bottom:20px;z-index:61;width:384px;height:min(640px,calc(100vh - 40px));display:flex;flex-direction:column;background:#0b1428;border:1px solid #2b3b5c;border-radius:20px;box-shadow:0 30px 80px #02050fcc;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#eef3ff;opacity:0;transform:translateY(14px) scale(.98);pointer-events:none;transition:opacity .22s,transform .22s}
+.nxc-open .nxc-panel{opacity:1;transform:none;pointer-events:auto}
+.nxc-head{display:flex;align-items:center;gap:12px;padding:16px 16px 14px;background:linear-gradient(180deg,#141f3d,#0e1830);border-bottom:1px solid #22314f}
+.nxc-av{position:relative;width:40px;height:40px;border-radius:12px;background:#1d1a4a;border:1px solid #4b4bb066;display:grid;place-items:center;flex:none}
+.nxc-av svg{width:24px;height:24px}
+.nxc-av:after{content:'';position:absolute;right:-3px;bottom:-3px;width:10px;height:10px;border-radius:50%;background:#4ade80;border:2px solid #111b35}
+.nxc-title{flex:1;min-width:0}
+.nxc-title b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.nxc-title span{display:block;font-size:12px;color:#93a4c3;margin-top:3px}
+.nxc-x{width:36px;height:36px;border-radius:10px;border:1px solid #2b3b5c;background:transparent;color:#c9d5ea;cursor:pointer;display:grid;place-items:center}
+.nxc-x:hover{background:#ffffff0d}
+.nxc-x svg{width:18px;height:18px}
+.nxc-body{flex:1;overflow-y:auto;padding:18px 16px 8px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;overscroll-behavior:contain}
+.nxc-msg{max-width:86%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.55;white-space:pre-line;word-wrap:break-word}
+.nxc-bot{align-self:flex-start;background:#15223f;border:1px solid #24345a;border-bottom-left-radius:6px;color:#e3eaf8}
+.nxc-me{align-self:flex-end;background:linear-gradient(110deg,#7350ee,#4d80f0);color:#fff;border-bottom-right-radius:6px}
+.nxc-note{align-self:center;font-size:11px;color:#7f90b0;letter-spacing:.02em}
+.nxc-typing{display:inline-flex;gap:4px;padding:14px 16px}
+.nxc-typing i{width:6px;height:6px;border-radius:50%;background:#8fa2c9;animation:nxcb 1s infinite}
+.nxc-typing i:nth-child(2){animation-delay:.15s}.nxc-typing i:nth-child(3){animation-delay:.3s}
+@keyframes nxcb{0%,80%,100%{opacity:.3;transform:none}40%{opacity:1;transform:translateY(-3px)}}
+.nxc-chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 4px}
+.nxc-chip{border:1px solid #3a4f7d;background:#101b33;color:#cdd9f2;border-radius:999px;padding:8px 13px;font-weight:600;font-size:13px;line-height:1.2;font-family:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.nxc-chip:hover{border-color:#8c91ff;background:#16224a;color:#fff}
+.nxc-chip.nxc-human{border-color:#5b6b8f;color:#e8edf8}
+.nxc-form{align-self:stretch;background:#111c36;border:1px solid #2a3b62;border-radius:16px;padding:14px;display:grid;gap:10px}
+.nxc-form h4{margin:0;font-size:14px;font-weight:700}
+.nxc-form p{margin:-4px 0 2px;font-size:12px;color:#93a4c3;line-height:1.5}
+.nxc-form label{display:grid;gap:5px;font-size:12px;font-weight:600;color:#b8c6de}
+.nxc-form input,.nxc-form select,.nxc-form textarea{width:100%;background:#0a1224;border:1px solid #2f4069;border-radius:10px;padding:10px 11px;color:#f2f6ff;font-weight:400;font-size:15px;line-height:1.35;font-family:inherit;outline:none}
+.nxc-form textarea{min-height:76px;resize:vertical}
+.nxc-form input:focus,.nxc-form select:focus,.nxc-form textarea:focus{border-color:#8c91ff;box-shadow:0 0 0 3px #8c91ff26}
+.nxc-form .nxc-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nxc-form .nxc-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.nxc-btn{border:0;border-radius:11px;padding:12px 14px;background:linear-gradient(110deg,#7a55f5,#4f86f7);color:#fff;font-weight:700;font-size:14px;line-height:1;font-family:inherit;cursor:pointer}
+.nxc-btn[disabled]{opacity:.6;cursor:default}
+.nxc-err{font-size:12px;color:#ff9aa8;min-height:0}
+.nxc-foot{border-top:1px solid #22314f;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#0b1428}
+.nxc-input{display:flex;gap:8px;align-items:flex-end}
+.nxc-input textarea{flex:1;resize:none;max-height:110px;min-height:44px;background:#0f1a31;border:1px solid #2f4069;border-radius:12px;padding:11px 12px;color:#f2f6ff;font:400 15px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;outline:none}
+.nxc-input textarea:focus{border-color:#8c91ff}
+.nxc-send{width:44px;height:44px;flex:none;border-radius:12px;border:0;background:linear-gradient(110deg,#7a55f5,#4f86f7);color:#fff;display:grid;place-items:center;cursor:pointer}
+.nxc-send svg{width:19px;height:19px}
+.nxc-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px;color:#7083a6}
+.nxc-meta button{background:none;border:0;color:#a9b8ff;font-weight:600;font-size:12px;line-height:1;font-family:inherit;cursor:pointer;padding:4px 0}
+@media (max-width:520px){
+ .nxc-launch{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));height:54px;padding:0 18px 0 15px}
+ .nxc-panel{right:0;bottom:0;left:0;top:0;width:auto;height:100%;height:100dvh;border-radius:0;border:0}
+ .nxc-head{padding-top:calc(14px + env(safe-area-inset-top))}
+ .nxc-msg{max-width:90%}
+ .nxc-form .nxc-row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.nxc-panel,.nxc-launch{transition:none}.nxc-typing i{animation:none}}
+
+.nxc-av{background:none;border:0}.nxc-av svg{width:40px;height:40px}
+
+/* live chat (tawk) active: our bubble/panel step aside so only one chat shows */
+.nxc-live .nxc-launch,.nxc-live .nxc-panel{display:none!important}
+
+/* v3: on phones the launcher is a small round button (no label) and the page ends with room for it,
+   so it no longer sits on top of the content cards or the footer links */
+@media (max-width:600px){
+ .nxc-launch{width:52px;height:52px;padding:0;justify-content:center;right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}
+ .nxc-launch .nxc-ltxt{display:none}
+ .nxc-launch .nxc-dot{top:8px;left:auto;right:8px}
+ body{padding-bottom:76px}
+}

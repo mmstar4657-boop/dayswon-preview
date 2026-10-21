@@ -1,0 +1,296 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#070d1d">
+<title>Days Won | More Customers. Less Chasing.</title>
+<meta name="description" content="Days Won installs a done-for-you system that responds to new inquiries, follows up automatically, and helps turn more opportunities into booked business.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Days Won"><meta property="og:title" content="Days Won | More Customers. Less Chasing."><meta property="og:description" content="Days Won installs a done-for-you system that responds to new inquiries, follows up automatically, and helps turn more opportunities into booked business."><meta property="og:image" content="icon-512.png"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Days Won | More Customers. Less Chasing."><meta name="twitter:description" content="Days Won installs a done-for-you system that responds to new inquiries, follows up automatically, and helps turn more opportunities into booked business.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="chat.css"><style>
+:root{--bg:#080e1e;--panel:#101b32;--line:#273550;--text:#f7f9ff;--muted:#aab8d0;--blue:#648bff;--violet:#a47bff;--err:#ff9aa8;--ok:#7fe0b6}
+*{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}
+[id]{scroll-margin-top:96px}
+:focus-visible{outline:3px solid #b9a6ff;outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:12px;top:-60px;z-index:50;background:#fff;color:#111d3a;padding:10px 14px;border-radius:8px;font-weight:700}.skip:focus{top:12px}
+.container{width:min(1180px,calc(100% - 44px));margin:auto}
+.nav{position:sticky;top:0;z-index:20;background:#080e1eee;backdrop-filter:blur(18px);border-bottom:1px solid #ffffff12}
+.nav-inner{height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.brand{display:flex;align-items:center;gap:11px}.brand svg{width:39px;height:39px;flex:none}
+.brand .wm{letter-spacing:-.02em;font-weight:800;font-size:23px;line-height:1.05}.brand .wm em{font-style:normal;background:linear-gradient(100deg,#b183ff,#669aff 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .wm small{display:block;margin-top:3px;font-size:9px;letter-spacing:.24em;color:var(--muted);-webkit-text-fill-color:var(--muted);font-weight:650}
+.links{display:flex;align-items:center;gap:28px;color:#d5dff0;font-size:14px}.links a:not(.btn):hover{color:#fff}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:9px;background:linear-gradient(110deg,#845aff,#548eff);border:1px solid #a6a6ff66;border-radius:12px;padding:14px 21px;font-weight:700;font-size:14px;color:#fff;cursor:pointer;transition:transform .2s,filter .2s;text-align:center}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.12)}.btn[disabled]{opacity:.7;cursor:progress;transform:none}
+.textlink{color:#c6d0ff;font-weight:700;font-size:15px;border-bottom:1px solid #6b7fc4;padding-bottom:2px}.textlink:hover{color:#fff}
+.menu{display:none;background:transparent;color:#fff;border:0;font-size:27px;cursor:pointer;padding:6px 8px}
+.hero{position:relative;overflow:hidden;padding:88px 0 96px;background:radial-gradient(ellipse at 80% 30%,#25236d88,transparent 50%),radial-gradient(ellipse at 10% 95%,#0b387144,transparent 55%)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:56px}
+.eyebrow{text-transform:uppercase;letter-spacing:.27em;font-size:11px;font-weight:800;color:#a5b9ff}
+.hero h1{font-size:clamp(45px,5.5vw,77px);line-height:1.055;letter-spacing:-.055em;margin:21px 0 25px}
+.gradient{background:linear-gradient(100deg,#b183ff,#669aff 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:#c6d2e7;font-size:18px;line-height:1.8;max-width:590px}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:22px;margin:30px 0 22px}
+.support{color:#9fb0cc;font-size:14px;margin:0}
+.flow-card{margin:0;background:#0d1729;border:1px solid #2b3d60;border-radius:20px;padding:24px;box-shadow:0 30px 70px #02061a80}
+.flow-card figcaption{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#d9cfff;background:#2c2560;border:1px solid #5b4fb5;border-radius:999px;padding:6px 11px}
+.flow-card .job{font-size:13px;color:#9fb0cc}
+.mini{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.mini li{display:flex;align-items:center;gap:12px;background:#121f38;border:1px solid #22324f;border-radius:12px;padding:12px 14px;font-size:14px;color:#d4ddee}
+.mini li:before{content:'';flex:none;width:20px;height:20px;border-radius:50%;background:#2c3c5d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.mini li.now{border-color:#7b6cff;background:#1b1f49;color:#fff;font-weight:700}.mini li.now:before{background-color:#7b63ff}
+.mini li small{margin-left:auto;font-size:11px;color:#b9b0ff;font-weight:700;white-space:nowrap}
+.flow-note{font-size:12px;color:#8a9bb8;margin:14px 0 0}
+.section{padding:92px 0}.section.light{background:#f6f8ff;color:#111d3a}
+.section h2{font-size:clamp(31px,4vw,49px);line-height:1.13;letter-spacing:-.04em;margin:15px 0}
+.section-intro{max-width:700px;color:var(--muted);line-height:1.75;font-size:17px}.light .section-intro{color:#4c5b78}
+.light .eyebrow{color:#5a4fd6}
+.center{text-align:center;margin-left:auto;margin-right:auto}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:42px}
+.card{background:linear-gradient(145deg,#14213c,#0d172a);border:1px solid #2c3c5d;border-radius:19px;padding:29px;transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-4px);border-color:#8c91ff}
+.card .icon{display:grid;place-items:center;width:50px;height:50px;background:#2a2558;border-radius:13px;margin-bottom:20px;color:#c9bcff}.card .icon svg{width:24px;height:24px}
+.card h3{font-size:20px;margin:0 0 10px;letter-spacing:-.01em}.card p{font-size:15px;color:#b2c0d6;line-height:1.7;margin:0}
+.scope-note{font-size:13px;color:#8a9bb8;margin:22px 0 0;max-width:760px;line-height:1.6}
+.timeline{list-style:none;margin:44px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;counter-reset:t}
+.timeline li{position:relative;background:#fff;border:1px solid #dfe5f4;border-radius:16px;padding:20px 18px;counter-increment:t;box-shadow:0 10px 30px #1a2a5a0d}
+.timeline li:before{content:counter(t);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#635bff;color:#fff;font-weight:800;font-size:14px;margin-bottom:14px}
+.timeline li:not(:last-child):after{content:'→';position:absolute;right:-13px;top:22px;color:#8c93c9;font-weight:800;font-size:16px}
+.timeline h3{font-size:16px;margin:0 0 8px;line-height:1.3}.timeline p{font-size:13.5px;color:#55647f;line-height:1.6;margin:0}
+.timeline .status{display:inline-block;margin-top:12px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#4a40c9;background:#ecebff;border-radius:999px;padding:4px 9px}
+.flow-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.flow-head .tag{color:#3f35b8;background:#ecebff;border-color:#c9c4ff}
+.sample{font-size:13px;color:#5f6d87;margin:14px 0 0}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.who-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.who-list li{background:#13203a;border:1px solid #2b3c5d;border-radius:14px;padding:18px;font-weight:700;font-size:15px;color:#dce5f5}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:42px;list-style:none;padding:0}
+.step{border-top:2px solid #d6def1;padding-top:22px}
+.number{background:#635bff;color:#fff;border-radius:50%;height:36px;width:36px;display:grid;place-items:center;font-weight:800}
+.step h3{margin:18px 0 8px;font-size:20px;line-height:1.3}.step p{font-size:15px;color:#55647f;line-height:1.7;margin:0}
+.faq{max-width:820px;margin:38px auto 0;display:grid;gap:12px}
+.faq details{background:#101b32;border:1px solid #2a3a5a;border-radius:14px;padding:0 22px}
+.faq summary{cursor:pointer;list-style:none;padding:20px 30px 20px 0;font-weight:700;font-size:17px;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:'+';position:absolute;right:0;top:16px;font-size:24px;color:#a99bff;font-weight:600}
+.faq details[open] summary:after{content:'–'}
+.faq details p{margin:0 0 20px;color:#b8c5da;line-height:1.7}
+.cta{background:radial-gradient(ellipse at 50% 120%,#3d2b98,transparent 60%),#0a1023;text-align:center;padding:86px 20px}
+.cta h2{font-size:clamp(32px,4vw,52px);margin:0 0 12px;letter-spacing:-.035em}.cta p{color:#b7c7e1;margin:0 0 28px;font-size:17px;line-height:1.6}
+.contact-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start}
+.contact-grid > div > p{line-height:1.8;color:#b3c2db;font-size:17px}
+.form{background:#111e36;border:1px solid #293b5b;padding:30px;border-radius:20px}
+.field{display:grid;gap:7px;margin-bottom:18px}
+.field label{font-size:14px;color:#dbe4f3;font-weight:600}.field label .opt{font-weight:400;color:#9fb0cc}.field label .req{color:#c9b8ff}
+.field input,.field textarea,.field select{width:100%;background:#091326;border:1px solid #3a4c6e;color:#fff;border-radius:10px;padding:13px;font-size:16px}
+.field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%23aab8d0' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:40px}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#a79dff;outline:3px solid #8b7dff66;outline-offset:1px}
+.field textarea{min-height:130px;resize:vertical;line-height:1.55}
+.field [aria-invalid=true]{border-color:var(--err)}
+.ferr{font-size:13px;color:var(--err);min-height:0}.ferr:empty{display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.form-alert{border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.55;margin:0 0 16px}.form-alert:empty{display:none}
+.form-alert.error{background:#3a1622;border:1px solid #8c3a4f;color:#ffd4dc}
+.form-success{background:#0f2b25;border:1px solid #2f7a63;color:#d6fff0;border-radius:16px;padding:26px;font-size:17px;line-height:1.6}
+.form-success:focus{outline:3px solid #7fe0b6;outline-offset:3px}
+.req-note{font-size:13px;color:#9fb0cc;margin:0 0 16px}
+.footer{padding:45px 0;border-top:1px solid #283550}
+.footer-inner{display:flex;justify-content:space-between;gap:25px;align-items:flex-start;flex-wrap:wrap}
+.footer p{font-size:13px;color:#8d9dba;max-width:420px;line-height:1.6}.footer nav a{font-size:14px;color:#b4c4db;margin-left:22px}.footer nav a:hover{color:#fff}
+.hero-visual{position:relative}.orb{position:absolute;right:-14px;top:-96px;width:128px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 32%,#8b8cff,#3822a9 32%,#121d47 60%,#090e1c 73%);box-shadow:0 0 50px #544fff44,inset -14px -13px 40px #050915;display:grid;place-items:center;z-index:0}.orb:before,.orb:after{content:"";position:absolute;inset:12%;border:1px solid #a4adff55;border-radius:50%;transform:rotate(-30deg) scaleX(.62)}.orb:after{transform:rotate(35deg) scaleX(.7)}.orb svg{width:50%;filter:drop-shadow(0 0 12px #9e8cff)}.hero-visual .flow-card{position:relative;z-index:1}@media(max-width:900px){.orb{width:72px;top:-38px;right:-4px}}
+@media(max-width:980px){.timeline{grid-template-columns:1fr 1fr}.timeline li:after{display:none}}
+@media(max-width:900px){.hero-grid,.contact-grid,.who{grid-template-columns:1fr}.hero{padding:56px 0 70px}.hero-grid{gap:40px}
+.links{display:none;position:absolute;top:76px;left:0;right:0;padding:22px;background:#0b1529;flex-direction:column;align-items:stretch;gap:6px;border-bottom:1px solid #22324f}
+.links a:not(.btn){padding:10px 0}.links .btn{margin-top:8px}.links.open{display:flex}.menu{display:block}.steps{grid-template-columns:1fr}}
+@media(max-width:600px){.container{width:calc(100% - 36px)}.contact-grid,.who{gap:28px}.cards,.who-list{grid-template-columns:1fr}.timeline{grid-template-columns:1fr}
+.hero h1{font-size:42px}.lead{font-size:17px}.section{padding:64px 0}.section h2{font-size:31px}.form{padding:22px}.card{padding:22px}
+.actions{flex-direction:column;align-items:stretch;gap:18px}.actions .textlink{align-self:flex-start}
+.brand .wm{font-size:21px}.brand .wm small{font-size:8px;letter-spacing:.18em}.flow-card{padding:18px}.mini li{font-size:13px;padding:11px 12px}
+.footer nav{display:flex;flex-wrap:wrap;gap:12px 20px}.footer nav a{margin:0}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* ---- v3: lead journey + new sections ---- */
+.hero h1 .l1,.hero h1 .l2{display:block}
+.brand .wm small{letter-spacing:.14em;font-size:8.5px}
+.hero h1{font-size:clamp(46px,6vw,84px);line-height:1.02;margin:20px 0 22px}
+.hero .sub{font-size:clamp(20px,2vw,24px);line-height:1.45;font-weight:700;color:#eef2ff;margin:0 0 16px;max-width:600px;letter-spacing:-.01em}
+.journey-card{position:relative;z-index:1;margin:0;background:linear-gradient(160deg,#111d36,#0b1427);border:1px solid #2b3d60;border-radius:22px;padding:24px 24px 18px;box-shadow:0 30px 70px #02061a80}
+.journey-card figcaption{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.journey-card .job{font-size:13px;color:#9fb0cc}
+.jlist{list-style:none;margin:0;padding:0;position:relative}
+.jlist:before{content:'';position:absolute;left:21px;top:calc(var(--jtop,27px) + 5px);height:var(--j3,0px);width:2px;background:#25365a;border-radius:2px}
+.jlist:after{content:'';position:absolute;left:17px;top:var(--jtop,27px);width:10px;height:10px;border-radius:50%;background:#b9a6ff;box-shadow:0 0 0 5px #7b63ff40,0 0 18px #9e8cff;animation:jdot 8s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes jdot{0%,8%{transform:translateY(0)}22%,33%{transform:translateY(var(--j1))}47%,58%{transform:translateY(var(--j2))}72%,92%{transform:translateY(var(--j3))}100%{transform:translateY(var(--j3));opacity:0}}
+.jlist li{position:relative;display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:10px 0}
+.jlist .ji{position:relative;z-index:1;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:#17233f;border:1px solid #2e4068;color:#c9bcff;animation:jlit 8s infinite}
+.jlist .ji svg{width:21px;height:21px}
+.jlist li:nth-child(2) .ji{animation-delay:2s}.jlist li:nth-child(3) .ji{animation-delay:4s}.jlist li:nth-child(4) .ji{animation-delay:6s}
+@keyframes jlit{0%,20%{background:#2c2470;border-color:#8a76ff;color:#fff;box-shadow:0 0 22px #7b63ff66}30%,100%{background:#17233f;border-color:#2e4068;color:#c9bcff;box-shadow:none}}
+.jlist h3{margin:0 0 3px;font-size:15px;letter-spacing:-.01em}
+.jlist p{margin:0;font-size:13px;color:#a9b7cf;line-height:1.45}
+.jlist .pill{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#cfc6ff;background:#231f4f;border:1px solid #463d99;border-radius:999px;padding:5px 9px;white-space:nowrap}
+.jlist .pill.ok{color:#bff5dc;background:#0f3029;border-color:#2c7a62}
+.jlist .bubble{display:inline-block;margin-top:6px;background:#1a2747;border:1px solid #2c3d63;border-radius:12px 12px 12px 4px;padding:7px 10px;font-size:12.5px;color:#dbe3f3}
+.jlist .bubble.out{background:#2a2466;border-color:#4c43a8;border-radius:12px 12px 4px 12px}
+.journey-card .flow-note{margin-top:10px}
+/* problem */
+.problem{background:#0a1124}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+.pcard{background:linear-gradient(160deg,#131f3a,#0d1629);border:1px solid #2a3a5b;border-radius:18px;padding:26px 22px}
+.pcard .icon{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:#3a1d38;color:#ffb4c4;margin-bottom:18px}.pcard .icon svg{width:22px;height:22px}
+.pcard h3{font-size:19px;margin:0 0 9px;letter-spacing:-.015em}.pcard p{margin:0;font-size:15px;line-height:1.65;color:#b2c0d6}
+.punch{margin:40px 0 0;font-size:clamp(20px,2.2vw,26px);font-weight:800;letter-spacing:-.02em;line-height:1.35;max-width:820px}
+/* solution journey */
+.path{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative}
+.path:before{content:'';position:absolute;left:12%;right:12%;top:34px;height:3px;border-radius:3px;background:linear-gradient(90deg,#d7dcf3,#d7dcf3)}
+.path:after{content:'';position:absolute;left:12%;top:34px;height:3px;border-radius:3px;width:0;background:linear-gradient(90deg,#8c5cff,#4f8dff);animation:pathfill 7s ease-in-out infinite}
+@keyframes pathfill{0%{width:0}70%,100%{width:76%}}
+.path li{position:relative;z-index:1;text-align:center;padding:0 6px}
+.path .node{width:70px;height:70px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;background:#fff;border:1px solid #dcdff3;color:#5a4fd6;box-shadow:0 12px 30px #1a2a5a14}
+.path .node svg{width:28px;height:28px}
+.path li:last-child .node{background:linear-gradient(135deg,#845aff,#548eff);color:#fff;border-color:transparent}
+.path .k{display:block;font-size:11px;font-weight:800;letter-spacing:.16em;color:#7a74c9;margin-bottom:6px}
+.path h3{font-size:19px;margin:0 0 8px;letter-spacing:-.015em}.path p{font-size:14.5px;color:#55647f;line-height:1.6;margin:0 auto;max-width:240px}
+.calm{margin:44px auto 0;max-width:760px;text-align:center;font-size:17px;color:#3c4a66;line-height:1.7}
+/* offer */
+.offer-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:60px;align-items:center}
+.offer-grid .section-intro{font-size:18px}
+.dfy{display:grid;gap:14px;margin:30px 0 32px;padding:0;list-style:none}
+.dfy li{display:flex;gap:14px;align-items:flex-start;color:#d6def0;font-size:15.5px;line-height:1.55}
+.dfy li b{color:#fff}
+.dfy .icon{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#2a2558;color:#c9bcff}.dfy .icon svg{width:18px;height:18px}
+.system{position:relative;border-radius:24px;padding:2px;background:linear-gradient(135deg,#9a6bff,#3f6fe0 60%,#2a3a66)}
+.system-in{background:linear-gradient(165deg,#121e39,#0b1426);border-radius:22px;padding:34px 32px}
+.system .tag{margin-bottom:16px}
+.system h3{font-size:clamp(23px,2.4vw,30px);line-height:1.2;letter-spacing:-.03em;margin:0 0 22px}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.checks li{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.5;color:#dce4f4}
+.checks li:before{content:'';flex:none;margin-top:1px;width:22px;height:22px;border-radius:50%;background:#6f5bff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.system .for{margin:24px 0 0;padding-top:20px;border-top:1px solid #2a3a5b;font-size:14px;color:#9fb0cc;line-height:1.6}
+/* benefits */
+.bgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;margin-top:46px}
+.bcard{flex:0 1 calc((100% - 36px)/3);background:#fff;border:1px solid #dfe5f4;border-radius:18px;padding:28px 26px;box-shadow:0 10px 30px #1a2a5a0d}
+.bcard .icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#ecebff;color:#5a4fd6;margin-bottom:18px}.bcard .icon svg{width:23px;height:23px}
+.bcard h3{font-size:20px;margin:0 0 8px;letter-spacing:-.02em;color:#111d3a}.bcard p{margin:0;font-size:15px;color:#55647f;line-height:1.65}
+/* final cta + form */
+.final{background:radial-gradient(ellipse at 20% 110%,#3d2b98aa,transparent 55%),radial-gradient(ellipse at 90% 0%,#1d2f7a66,transparent 50%),#0a1023}
+.final h2{font-size:clamp(38px,5vw,64px);line-height:1.04;letter-spacing:-.05em;margin:16px 0 18px}
+.final .contact-grid > div > p{font-size:18px}
+.final .promise{margin:26px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.final .promise li{display:flex;gap:10px;align-items:center;color:#cdd8ec;font-size:15px}
+.final .promise li:before{content:'';flex:none;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#a46bff,#4f8dff)}
+@media(max-width:980px){.pgrid{grid-template-columns:1fr 1fr}.bcard{flex-basis:calc((100% - 18px)/2)}}
+@media(max-width:900px){.offer-grid{grid-template-columns:1fr;gap:40px}
+.path{grid-template-columns:1fr;gap:0;max-width:520px;margin-left:auto;margin-right:auto}
+.path:before{left:34px;right:auto;top:30px;bottom:30px;width:3px;height:auto}
+.path:after{left:34px;top:30px;width:3px;height:0;animation:pathfillv 7s ease-in-out infinite}
+@keyframes pathfillv{0%{height:0}70%,100%{height:calc(100% - 60px)}}
+.path li{display:grid;grid-template-columns:70px 1fr;gap:18px;text-align:left;padding:0 0 26px;align-items:start}
+.path .node{margin:0}.path p{margin:0;max-width:none}}
+@media(max-width:600px){.pgrid{grid-template-columns:1fr}.bcard{flex-basis:100%}.hero h1{font-size:46px}.hero .sub{font-size:20px}
+.system-in{padding:26px 20px}.journey-card{padding:18px 16px 14px}.jlist li{grid-template-columns:40px 1fr auto;gap:12px}.jlist .ji{width:40px;height:40px}.jlist:before{left:19px}.jlist:after{left:15px}
+.jlist .pill{font-size:10px;padding:4px 7px}.brand .wm small{display:none}.final h2{font-size:40px}.hero .eyebrow{letter-spacing:.16em;font-size:10.5px}.hero h1{font-size:clamp(34px,10.6vw,46px)}.journey-card .job{display:none}.journey-card .tag{font-size:10px;letter-spacing:.1em}}
+@media(prefers-reduced-motion:reduce){.jlist:after,.path:after{display:none}}
+</style></head>
+<body><a class="skip" href="#main">Skip to content</a>
+<header class="nav"><div class="container nav-inner"><a class="brand" href="#home" aria-label="Days Won home"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="nvg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#a46bff"/><stop offset="1" stop-color="#4f8dff"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="url(#nvg)"/><path d="M18 15.5H31a16.5 16.5 0 0 1 0 33H18Z" fill="none" stroke="#fff" stroke-width="5.6" stroke-linejoin="round"/><path d="M25 32.3l5 5 9.6-10.4" fill="none" stroke="#fff" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Days<em>Won</em><small>MORE CUSTOMERS. LESS CHASING.</small></span></a>
+<nav class="links" id="navlinks" aria-label="Main"><a href="#problem">The problem</a><a href="#how">How it works</a><a href="#system">The system</a><a href="#benefits">Benefits</a><a href="#contact" class="btn" data-track="primary_cta_click">Get Your Days Back</a></nav>
+<button class="menu" id="menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navlinks">☰</button></div></header>
+<main id="main">
+<section class="hero" id="home" aria-labelledby="hero-h"><div class="container hero-grid"><div>
+<div class="eyebrow">Done-for-you lead follow-up &amp; booking</div>
+<h1 id="hero-h"><span class="l1">More Customers.</span> <span class="gradient l2">Less Chasing.</span></h1>
+<p class="sub">Stop losing business to missed inquiries and forgotten follow-ups.</p>
+<p class="lead">Days Won installs a done-for-you system that responds, follows up, and helps turn opportunities into booked business automatically.</p>
+<div class="actions"><a class="btn" href="#contact" data-track="primary_cta_click">Get Your Days Back</a><a class="textlink" href="#how">See how it works →</a></div>
+<p class="support">You run your business. We make sure opportunities don’t slip away.</p></div>
+<div class="hero-visual"><div class="orb" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 11.5H31a20.5 20.5 0 0 1 0 41H14Z" fill="none" stroke="#f2f3ff" stroke-width="5.2" stroke-linejoin="round"/><path d="M23.5 32.5l6 6 11.5-12.5" fill="none" stroke="#f2f3ff" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><figure class="journey-card" aria-label="Illustration: one new inquiry moving through the system to a booked appointment"><figcaption><span class="tag">One inquiry, start to booked</span><span class="job">Example</span></figcaption>
+<ol class="jlist">
+<li><span class="ji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><div><h3>New inquiry</h3><p>A customer reaches out while you’re busy.</p><span class="bubble">“Hi, do you have any openings this week?”</span></div><span class="pill">Incoming</span></li>
+<li><span class="ji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><h3>Instant response</h3><p>They hear back right away.</p><span class="bubble out">“Thanks for reaching out! Let’s get you on the schedule.”</span></div><span class="pill">Automatic</span></li>
+<li><span class="ji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></span><div><h3>Automatic follow-up</h3><p>No reply yet? A friendly follow-up goes out.</p></div><span class="pill">Automatic</span></li>
+<li><span class="ji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M9 15.5l2 2 4-4"/></svg></span><div><h3>Booked appointment</h3><p>Confirmed, with a reminder before the visit.</p></div><span class="pill ok">Booked</span></li>
+</ol>
+<p class="flow-note">Illustration with a sample conversation.</p></figure></div>
+</div></section>
+
+<section class="section problem" id="problem" aria-labelledby="problem-h"><div class="container">
+<div class="eyebrow">The problem</div>
+<h2 id="problem-h">How Much Business Is Slipping Through the Cracks?</h2>
+<p class="section-intro">You’re on a job, with a client, or simply out of hours. Customers don’t wait. When they don’t hear back, they move on to whoever answers first.</p>
+<div class="pgrid">
+<article class="pcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/><path d="M16 2l6 6M22 2l-6 6"/></svg></div><h3>Missed calls</h3><p>The phone rings while your hands are full. By the time you call back, they’ve found someone else.</p></article>
+<article class="pcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/></svg></div><h3>Unanswered inquiries</h3><p>A form, a text, a message after hours. It sits there, and the customer goes cold.</p></article>
+<article class="pcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Forgotten follow-ups</h3><p>The estimate went out. The callback was promised. Then the week got busy.</p></article>
+<article class="pcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div><h3>Repetitive admin</h3><p>Replying, reminding, confirming and keeping track. Hours of your week that don’t grow the business.</p></article>
+</div>
+<p class="punch">Every one of these is a customer who already wanted to work with you.</p>
+</div></section>
+
+<section class="section light" id="how" aria-labelledby="how-h"><div class="container">
+<div class="eyebrow center">The solution</div>
+<h2 class="center" id="how-h">Your Business Keeps Moving. Even When You’re Busy.</h2>
+<p class="section-intro center">Every new opportunity follows the same simple path, without you chasing it.</p>
+<ol class="path" aria-label="New inquiry, instant response, automatic follow-up, booked appointment">
+<li><span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span><div><span class="k">STEP 1</span><h3>New Inquiry</h3><p>A customer calls, texts or fills in a form. Day or night.</p></div></li>
+<li><span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><div><span class="k">STEP 2</span><h3>Instant Response</h3><p>They hear back right away, while they’re still deciding.</p></div></li>
+<li><span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></span><div><span class="k">STEP 3</span><h3>Automatic Follow-Up</h3><p>No reply? Follow-ups go out on time, every time.</p></div></li>
+<li><span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M9 15.5l2 2 4-4"/></svg></span><div><span class="k">STEP 4</span><h3>Booked Appointment</h3><p>An appointment, estimate or callback is booked, with confirmations and reminders sent.</p></div></li>
+</ol>
+<p class="calm">You step in when it’s time to do the work. Everything before that keeps moving on its own.</p>
+</div></section>
+
+<section class="section" id="system" aria-labelledby="system-h"><div class="container offer-grid">
+<div><div class="eyebrow">Our signature service</div>
+<h2 id="system-h">The Days Won Lead Recovery &amp; Booking System</h2>
+<p class="section-intro">One system designed to capture more opportunities and eliminate repetitive follow-up work.</p>
+<ul class="dfy">
+<li><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span><span><b>Done for you.</b> We install it and set it up around how your business already works.</span></li>
+<li><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span><span><b>Built for outcomes.</b> You don’t manage software. You get more booked business.</span></li>
+<li><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span><b>Your time back.</b> Less chasing, fewer loose ends, more hours for the work that matters.</span></li>
+</ul>
+<a class="btn" href="#contact" data-track="primary_cta_click">Get Your Days Back</a></div>
+<div class="system"><div class="system-in"><span class="tag">What the system does</span>
+<h3>Every opportunity handled, start to booked.</h3>
+<ul class="checks">
+<li>Responds instantly to new inquiries</li>
+<li>Follows up automatically with potential customers</li>
+<li>Turns inquiries into booked appointments, estimates, or callbacks</li>
+<li>Sends confirmations and reminders</li>
+<li>Keeps track of every conversation and opportunity</li>
+<li>Reduces the manual work of managing customers</li>
+</ul>
+<p class="for">Built for service businesses: contractors, plumbers, HVAC companies, consultants, therapists, and appointment-based professionals.</p>
+</div></div>
+</div></section>
+
+<section class="section light" id="benefits" aria-labelledby="benefits-h"><div class="container">
+<div class="eyebrow center">What you win</div>
+<h2 class="center" id="benefits-h">Win more business. Win back your days.</h2>
+<div class="bgrid">
+<article class="bcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></div><h3>More opportunities captured</h3><p>Every inquiry gets an answer, so fewer customers slip away to someone else.</p></article>
+<article class="bcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Faster customer responses</h3><p>Customers hear back while they’re still ready to book.</p></article>
+<article class="bcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></div><h3>More consistent follow-ups</h3><p>Follow-ups go out every time, not only when you remember.</p></article>
+<article class="bcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg></div><h3>Less administrative work</h3><p>Replies, reminders and tracking happen without you doing them.</p></article>
+<article class="bcard"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div><h3>More time to run the business</h3><p>Spend your hours on the work and your customers, not on chasing.</p></article>
+</div></div></section>
+
+<section class="section final" id="contact" aria-labelledby="contact-h"><div class="container contact-grid">
+<div><div class="eyebrow">Get started</div><h2 id="contact-h">Stop Chasing. <span class="gradient">Start Winning.</span></h2>
+<p>Tell us about your business and where leads slip through today. We’ll show you how the system would catch them.</p>
+<ul class="promise"><li>Done for you, start to finish</li><li>Built around how you already work</li><li>One clear system, no long list of services</li></ul></div>
+<div id="formWrap">
+<form class="form" id="contactForm" novalidate aria-describedby="reqnote">
+<p class="req-note" id="reqnote">Fields marked <span aria-hidden="true">*</span><span class="sr">with an asterisk</span> are required.</p>
+<div class="form-alert" id="formAlert" role="alert" tabindex="-1"></div>
+<div class="field"><label for="f-name">Your name <span class="req" aria-hidden="true">*</span></label><input id="f-name" name="name" required autocomplete="name" maxlength="120" aria-describedby="e-name"><span class="ferr" id="e-name"></span></div>
+<div class="field"><label for="f-company">Business name <span class="req" aria-hidden="true">*</span></label><input id="f-company" name="company" required autocomplete="organization" maxlength="160" aria-describedby="e-company"><span class="ferr" id="e-company"></span></div>
+<div class="field"><label for="f-btype">Type of business <span class="req" aria-hidden="true">*</span></label><input id="f-btype" name="business_type" required maxlength="120" placeholder="e.g. HVAC, consulting, therapy" aria-describedby="e-btype"><span class="ferr" id="e-btype"></span></div>
+<div class="field"><label for="f-email">Email <span class="req" aria-hidden="true">*</span></label><input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" maxlength="200" aria-describedby="e-email"><span class="ferr" id="e-email"></span></div>
+<div class="field"><label for="f-phone">Phone number <span class="opt">(optional)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
+<div class="field"><label for="f-msg">Where do leads slip through today? <span class="req" aria-hidden="true">*</span></label><textarea id="f-msg" name="message" required maxlength="4000" placeholder="For example: I miss calls while I’m on jobs, and estimates go out without a follow-up." aria-describedby="e-msg"></textarea><span class="ferr" id="e-msg"></span></div>
+<div class="hp" aria-hidden="true"><label for="f-website">Leave this field empty</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
+<button type="submit" class="btn" id="submitBtn" style="width:100%">Get Your Days Back</button>
+</form></div>
+</div></section>
+</main>
+<footer class="footer"><div class="container footer-inner"><div><a class="brand" href="#home" aria-label="Days Won home"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="ftg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#a46bff"/><stop offset="1" stop-color="#4f8dff"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="16" fill="url(#ftg)"/><path d="M18 15.5H31a16.5 16.5 0 0 1 0 33H18Z" fill="none" stroke="#fff" stroke-width="5.6" stroke-linejoin="round"/><path d="M25 32.3l5 5 9.6-10.4" fill="none" stroke="#fff" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Days<em>Won</em><small>MORE CUSTOMERS. LESS CHASING.</small></span></a>
+<p>Done-for-you lead follow-up and booking for service businesses. More Customers. Less Chasing.</p><p>© <span id="year"></span> Days Won. All rights reserved.</p></div>
+<nav aria-label="Footer"><a href="#problem">The problem</a><a href="#how">How it works</a><a href="#system">The system</a><a href="#benefits">Benefits</a><a href="#contact">Get Your Days Back</a></nav></div></footer>
+<script src="site.js" defer></script><script src="chat.js" defer></script></body></html>
