@@ -9,7 +9,7 @@
    the "Book My Free Time Audit" button to that link instead. Nothing else needs to change. */
 var BOOKING_URL = "";
 
-var VERSION = "20261026v4";
+var VERSION = "20261026v4b";
 var STORE_KEY = "dw_busywork_v1";
 var LEAD_API = "https://dayswon.sites.tab.bot/api/lead";
 var WEEKS_PER_YEAR = 52;
@@ -258,7 +258,7 @@ if (FRAMED && !EMBED) document.documentElement.className += " dw-framed";
 /* In an iframe: tell the parent page our height (message {type:"dayswon-audit:height", height}). */
 function postHeight() {
   if (!FRAMED) return;
-  try { window.parent.postMessage({ type: "dayswon-audit:height", height: Math.ceil(document.documentElement.scrollHeight) }, "*"); } catch (e) {}
+  try { window.parent.postMessage({ type: "dayswon-audit:height", height: Math.ceil(document.body.getBoundingClientRect().height) }, "*"); } catch (e) {}
 }
 if (FRAMED) {
   window.addEventListener("load", postHeight); window.addEventListener("resize", postHeight);
@@ -398,8 +398,8 @@ function results() {
     var label = '<div class="task-bar-title"><strong>' + esc(o.l) + '</strong><b>' + (hh === null ? 'Not sure' : esc(b.l) + ' hrs/wk') + '</b></div>';
     var visual = hh === null ? '' : '<div class="task-track" role="img" aria-label="' + esc(o.l) + ': ' + fmt(hh) + ' of ' + fmt(rep.weekly) + ' weekly hours"><i style="width:' + w + '%"></i></div>';
     var math = hh === null ? 'Not counted (you weren\'t sure).' :
-      'Cost: ' + fmt(hh) + ' hrs/wk × ' + money(rep.rate) + ' × ' + WEEKS_PER_YEAR + ' = <strong>' + money(hh * rep.rate * WEEKS_PER_YEAR) + '/yr</strong><br>' +
-      (r.skipped ? 'Win-back: no estimate (method not given).' : 'Win-back: ' + fmt(r.hours) + ' hrs/wk × ' + pct(r.share[0]) + '–' + pct(r.share[1]) + ' (' + byV(METHODS, r.method).l.toLowerCase() + ') = <strong>' + rangeText(r) + '</strong>');
+      'Cost: ' + fmt(hh) + (hh === 1 ? ' hr/wk × ' : ' hrs/wk × ') + money(rep.rate) + ' × ' + WEEKS_PER_YEAR + ' = <strong>' + money(hh * rep.rate * WEEKS_PER_YEAR) + '/yr</strong><br>' +
+      (r.skipped ? 'Win-back: no estimate (method not given).' : 'Win-back: ' + fmt(r.hours) + (r.hours === 1 ? ' hr/wk × ' : ' hrs/wk × ') + pct(r.share[0]) + '–' + pct(r.share[1]) + ' (' + byV(METHODS, r.method).l.toLowerCase() + ') = <strong>' + rangeText(r) + '</strong>');
     return '<div class="task-bar-item">' + label + visual + '<p class="task-math">' + math + '</p></div>';
   }).join("") + '</div>';
   h += '<ul class="how-list">' +
