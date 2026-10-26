@@ -200,3 +200,22 @@ details summary::-webkit-details-marker{display:none}
 @media (max-width:420px){.res-hero,.next-step,.lead{padding:20px}}
 .checks li.skip{color:var(--muted)}
 .checks li.skip::before{border:0;transform:none;width:10px;height:2px;top:12px;background:var(--muted)}
+
+/* Time Audit v3: screenshot-friendly, honest task-by-task breakdown. */
+.workweeks{margin-top:16px;color:var(--soft);font-size:16px;line-height:1.5}
+.workweeks strong{color:#fff;font-weight:800}
+.task-bars{display:grid;gap:10px;margin-top:20px}
+.task-bar-item{padding:16px 18px;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.task-bar-title{display:flex;justify-content:space-between;gap:14px;align-items:baseline;font-size:15px;line-height:1.35}
+.task-bar-title strong{font-weight:750}.task-bar-title b{color:var(--blue-ink);white-space:nowrap;font-size:16px}
+.task-track{height:9px;background:var(--panel2);border-radius:20px;margin:12px 0 10px;overflow:hidden}
+.task-track i{height:100%;display:block;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:20px}
+.task-math{color:var(--muted);font-size:13.5px;line-height:1.5}
+.task-math strong{color:var(--text)}
+.share-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0 12px}
+.share-status{color:var(--blue-ink);font-size:14px}
+@media(max-width:420px){.task-bar-item{padding:15px}.task-bar-title{align-items:flex-start}.task-bar-title strong{max-width:62%}.task-math{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.task-track i{transition:none!important}}
+.res-brand{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}.res-brand span:first-child{font-weight:800;color:var(--soft)}.res-brand em{font-style:normal;color:var(--blue2)}
+.workweeks{display:flex;gap:16px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 18px}.ww-n{flex:none;font-size:clamp(40px,10vw,52px);font-weight:850;line-height:1;color:var(--blue2);letter-spacing:-.02em;min-width:1.4em;text-align:center}
+.stat .v{font-size:clamp(40px,10.5vw,54px)}
