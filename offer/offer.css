@@ -98,10 +98,9 @@
 .o-form{max-width:680px;margin:0 auto}
 .o-form h2{outline:none}
 .founding-opt{margin-top:16px}
-/* quiz lead-in */
-.quiz-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);padding:44px 0}
-.quiz-in{display:flex;justify-content:space-between;align-items:center;gap:20px 32px;flex-wrap:wrap}
-.quiz-in h2{font-size:clamp(24px,3vw,32px)}
-.quiz-in p{color:var(--muted);margin-top:8px;max-width:52ch}
-@media (max-width:560px){.quiz-in .btn{width:100%}.section{padding:68px 0}.o-hero{padding:56px 0 64px}.final{padding:72px 0 56px}}
+/* embedded Time Audit (../time-audit/audit.js in embed mode) */
+.quiz-sec{background:var(--bg2);border-top:1px solid var(--line);border-bottom:0;padding:72px 0 88px}
+.quiz-sec .audit-shell{scroll-margin-top:84px}
+.quiz-sec .intro-card h2{font-size:clamp(30px,6vw,44px);margin:10px 0 14px}
+@media (max-width:560px){.section{padding:68px 0}.o-hero{padding:56px 0 64px}.final{padding:72px 0 56px}}
 .price-v .nw{white-space:nowrap}

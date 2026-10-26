@@ -23,15 +23,15 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="stylesheet" href="../styles.css?v=offer1">
-<link rel="stylesheet" href="offer.css?v=offer1">
+<link rel="stylesheet" href="../styles.css?v=offer2">
+<link rel="stylesheet" href="offer.css?v=offer2">
 </head>
 <body class="offer">
 <a class="skip" href="#main">Skip to content</a>
 <div class="pv-bar" role="note">Private preview. Values in dashed boxes, like <span class="ph" title="Placeholder: fill in before publishing">$[X]</span>, are placeholders to fill in.</div>
 <header class="nav"><div class="wrap nav-in">
 <a class="brand" href="../" aria-label="DaysWon home"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="16" fill="#3f7bff"/><path d="M18 15.5H31a16.5 16.5 0 0 1 0 33H18Z" fill="none" stroke="#fff" stroke-width="5.6" stroke-linejoin="round"/><path d="M25 32.3l5 5 9.6-10.4" fill="none" stroke="#fff" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Days<em>Won</em></span></a>
-<nav class="nav-links" aria-label="Main"><a href="#offer">The offer</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a class="btn sm" href="#book" data-cta="audit" data-track="nav_cta_click"><span class="lg">Book My Free Time Audit</span><span class="xs">Book My Free Audit</span></a></nav>
+<nav class="nav-links" aria-label="Main"><a href="#offer">The offer</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#time-audit">Time Audit</a><a class="btn sm" href="#book" data-cta="audit" data-track="nav_cta_click"><span class="lg">Book My Free Time Audit</span><span class="xs">Book My Free Audit</span></a></nav>
 </div></header>
 <main id="main">
 
@@ -213,13 +213,13 @@
 <form class="lead o-form" id="bookForm" novalidate>
 <h2 id="book-h" tabindex="-1">Book My Free Time Audit</h2>
 <p class="muted">Leave your details and we'll call you back to set up your free 30-minute Time Audit.</p>
-<div class="two"><div class="fld"><label for="f_name">Name</label><input id="f_name" name="name" autocomplete="name" required maxlength="120"></div>
-<div class="fld"><label for="f_phone">Phone</label><input id="f_phone" name="phone" type="tel" autocomplete="tel" required maxlength="40"></div></div>
-<div class="two"><div class="fld"><label for="f_email">Email</label><input id="f_email" name="email" type="email" autocomplete="email" required maxlength="200"></div>
-<div class="fld"><label for="f_time">Best time to call</label><select id="f_time" name="bestTime" required><option value="">Choose a time</option><option>Morning (9-12)</option><option>Midday (12-2)</option><option>Afternoon (2-5)</option><option>Evening (5-7)</option><option>Any time</option></select></div></div>
-<label class="consent founding-opt"><input type="checkbox" name="founding" id="f_founding"><span>I'm interested in a founding spot.</span></label>
-<div class="hp" aria-hidden="true"><label for="f_website">Website</label><input id="f_website" name="website" tabindex="-1" autocomplete="off"></div>
-<label class="consent"><input type="checkbox" name="consent" id="f_consent" required><span>I agree that DaysWon may contact me by phone, text or email about my Time Audit.</span></label>
+<div class="two"><div class="fld"><label for="b_name">Name</label><input id="b_name" name="name" autocomplete="name" required maxlength="120"></div>
+<div class="fld"><label for="b_phone">Phone</label><input id="b_phone" name="phone" type="tel" autocomplete="tel" required maxlength="40"></div></div>
+<div class="two"><div class="fld"><label for="b_email">Email</label><input id="b_email" name="email" type="email" autocomplete="email" required maxlength="200"></div>
+<div class="fld"><label for="b_time">Best time to call</label><select id="b_time" name="bestTime" required><option value="">Choose a time</option><option>Morning (9-12)</option><option>Midday (12-2)</option><option>Afternoon (2-5)</option><option>Evening (5-7)</option><option>Any time</option></select></div></div>
+<label class="consent founding-opt"><input type="checkbox" name="founding" id="b_founding"><span>I'm interested in a founding spot.</span></label>
+<div class="hp" aria-hidden="true"><label for="b_website">Website</label><input id="b_website" name="website" tabindex="-1" autocomplete="off"></div>
+<label class="consent"><input type="checkbox" name="consent" id="b_consent" required><span>I agree that DaysWon may contact me by phone, text or email about my Time Audit.</span></label>
 <p class="err" id="bookErr" role="alert"></p>
 <button class="btn" type="submit" id="bookSubmit" style="width:100%;margin-top:4px">Request my call</button>
 <p class="status" id="bookStatus" role="status"></p>
@@ -228,13 +228,10 @@
 </div>
 </section>
 
-<section class="quiz-band" id="quiz" aria-labelledby="quiz-h">
-<div class="wrap quiz-in">
-<div>
-<h2 id="quiz-h">Not sure where your hours go?</h2>
-<p>Take the 2-minute Time Audit and see your weekly and yearly hours, from your own answers.</p>
-</div>
-<a class="btn ghost" href="../time-audit/" data-track="offer_quiz_click">Take the 2-minute Time Audit</a>
+<section class="section quiz-sec" id="time-audit" aria-label="Time Audit">
+<div class="audit-shell" id="audit">
+<noscript><p class="intro-card">The Time Audit needs JavaScript. You can also email <a href="mailto:hello@dayswon.com">hello@dayswon.com</a> and tell us where your week goes.</p></noscript>
+<div id="app" data-embed="1" data-share-url="../time-audit/" aria-live="polite"></div>
 </div>
 </section>
 
@@ -244,6 +241,7 @@
 <div><p>Questions? <a href="mailto:hello@dayswon.com">hello@dayswon.com</a></p><p>© <span data-year>2026</span> DaysWon</p></div>
 </div></footer>
 <script src="../track.js"></script>
-<script src="offer.js?v=offer1"></script>
+<script src="offer.js?v=offer2"></script>
+<script src="../time-audit/audit.js?v=offer2"></script>
 </body>
 </html>

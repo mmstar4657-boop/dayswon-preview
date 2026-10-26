@@ -194,6 +194,10 @@ window.DaysWonAudit = { RECOVERY_TABLE: RECOVERY_TABLE, _state: function () { re
 
 /* ---------- rendering helpers ---------- */
 var app = document.getElementById("app");
+/* Optional embed mode (used on /offer/): <div id="app" data-embed="1" data-share-url="../time-audit/">.
+   Without these attributes the standalone /time-audit/ page behaves exactly as before. */
+var EMBED = !!(app && app.getAttribute("data-embed"));
+var SHARE_URL = (app && app.getAttribute("data-share-url")) || "./";
 function progress(n) {
   var p = Math.round(n / TOTAL_STEPS * 100);
   return '<div class="prog"><div class="prog-top"><span>Step ' + n + ' of ' + TOTAL_STEPS + '</span><span>' + p + '%</span></div>' +
@@ -222,13 +226,15 @@ function render(focus) {
   else if (S.step === 5) h = stepMethod();
   else if (S.step === 6) h = stepShell(6, "What would you most like to get back?", "", '<div class="opts">' + GOALS.map(function (o) { return radio("goal", o, S.goal === o.v); }).join("") + '</div>');
   else h = results();
+  if (EMBED) h = h.replace(/<h1 /g, "<h2 ").replace(/<\/h1>/g, "</h2>"); /* one h1 per page when embedded */
   app.innerHTML = h;
   bind();
   if (S.step === TOTAL_STEPS + 1 && reported().known) { countUp(document.querySelector("[data-weekly]"), reported().weekly); countUp(document.querySelector("[data-yearly]"), reported().yearly); }
   if (focus !== false) {
     var t = document.getElementById("qh");
     if (t) { t.focus({ preventScroll: true }); }
-    window.scrollTo(0, 0);
+    if (EMBED) { var shell = app.parentNode || app; window.scrollTo(0, Math.max(0, shell.getBoundingClientRect().top + (window.pageYOffset || 0) - 84)); }
+    else window.scrollTo(0, 0);
   }
 }
 
@@ -486,7 +492,7 @@ function countUp(el, target) {
   if (window.requestAnimationFrame) { show(0); requestAnimationFrame(frame); } else show(target);
 }
 function shareAudit() {
-  var url = new URL("./", location.href).href; /* the audit page only: never an audit ID or answers */
+  var url = new URL(SHARE_URL, location.href).href; /* the audit page only: never an audit ID or answers */
   var text = "How many hours is busywork costing you? Take the 2-minute DaysWon Time Audit.";
   var st = document.getElementById("shareStatus");
   track("audit_shared", {});

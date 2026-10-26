@@ -10,12 +10,12 @@ document.addEventListener("click", function (e) {
   var a = e.target.closest && e.target.closest("[data-cta]");
   if (!a) return;
   interest = a.getAttribute("data-cta") || "audit";
-  if (interest === "founding") document.getElementById("f_founding").checked = true;
+  if (interest === "founding") document.getElementById("b_founding").checked = true;
   e.preventDefault();
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.getElementById("book").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   if (history.replaceState) history.replaceState(null, "", "#book");
-  setTimeout(function () { var n = document.getElementById("f_name"); if (n && !sent) n.focus({ preventScroll: true }); }, reduce ? 0 : 550);
+  setTimeout(function () { var n = document.getElementById("b_name"); if (n && !sent) n.focus({ preventScroll: true }); }, reduce ? 0 : 550);
 });
 form.addEventListener("input", function (e) { if (e.target && e.target.removeAttribute) e.target.removeAttribute("aria-invalid"); });
 form.addEventListener("submit", function (e) {
@@ -26,11 +26,11 @@ form.addEventListener("submit", function (e) {
   var v = function (n) { var x = form.elements[n]; return x ? String(x.value || "").trim() : ""; };
   var d = { name: v("name"), phone: v("phone"), email: v("email"), bestTime: v("bestTime"), founding: form.elements.founding.checked, at: new Date().toISOString() };
   var bad = null;
-  if (!d.name) bad = ["f_name", "Please enter your name."];
-  else if (d.phone.replace(/\D/g, "").length < 7) bad = ["f_phone", "Please enter a phone number we can call."];
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad = ["f_email", "Please enter a valid email address."];
-  else if (!d.bestTime) bad = ["f_time", "Please pick a good time to call."];
-  else if (!form.elements.consent.checked) bad = ["f_consent", "Please tick the box so we can contact you."];
+  if (!d.name) bad = ["b_name", "Please enter your name."];
+  else if (d.phone.replace(/\D/g, "").length < 7) bad = ["b_phone", "Please enter a phone number we can call."];
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad = ["b_email", "Please enter a valid email address."];
+  else if (!d.bestTime) bad = ["b_time", "Please pick a good time to call."];
+  else if (!form.elements.consent.checked) bad = ["b_consent", "Please tick the box so we can contact you."];
   if (bad) { err.textContent = bad[1]; var el = document.getElementById(bad[0]); if (el) { el.setAttribute("aria-invalid", "true"); el.focus(); } return; }
   sending = true; b.disabled = true; b.textContent = "Sending…";
   var wants = d.founding ? "Claim My Founding Spot" : "Book My Free Time Audit";
