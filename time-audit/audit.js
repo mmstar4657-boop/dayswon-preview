@@ -9,7 +9,7 @@
    the "Book My Free Time Audit" button to that link instead. Nothing else needs to change. */
 var BOOKING_URL = "";
 
-var VERSION = "20261026v4b";
+var VERSION = "20261026v4c";
 var STORE_KEY = "dw_busywork_v1";
 var LEAD_API = "https://dayswon.sites.tab.bot/api/lead";
 var WEEKS_PER_YEAR = 52;
@@ -385,7 +385,7 @@ function results() {
     : '<button class="btn" type="button" data-mode="call">Book My Free Time Audit</button>';
   h += '<section class="next-step offer-box" aria-labelledby="ns-h"><h2 id="ns-h">Get these hours back</h2>' +
     '<p class="muted" style="margin-top:6px">Book a free 30-minute Time Audit. We\'ll map your week and show you exactly what we\'d build first.</p>' +
-    '<ul class="promise"><li><strong>Your system goes live in 7 days, or setup is free.</strong></li><li><strong>We work until it works.</strong></li></ul>' +
+    '<ul class="promise"><li><strong>We work until it works.</strong></li></ul>' +
     '<p class="spots"><span class="dot" aria-hidden="true"></span>Only a few founding spots left.</p>' +
     '<div class="actions">' + bookBtn + '<button class="btn ghost" type="button" data-mode="email">Email me a copy</button></div></section>';
   h += '<div id="leadBox">' + leadBox() + '</div>';
