@@ -198,3 +198,5 @@ details summary::-webkit-details-marker{display:none}
 .opp .t{flex-direction:column-reverse;align-items:flex-start;gap:4px}
 .opp .from{white-space:normal}
 @media (max-width:420px){.res-hero,.next-step,.lead{padding:20px}}
+.checks li.skip{color:var(--muted)}
+.checks li.skip::before{border:0;transform:none;width:10px;height:2px;top:12px;background:var(--muted)}

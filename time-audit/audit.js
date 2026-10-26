@@ -224,8 +224,8 @@ function results() {
   }
   h += '<ul class="checks" style="margin-top:14px" data-est-rows>' + est.rows.map(function (r) {
     var o = byV(TASKS, r.task);
-    if (r.skipped === "hours") return '<li>' + esc(o.l) + ': no estimate, because you weren\'t sure about the hours.</li>';
-    if (r.skipped) return '<li>' + esc(o.l) + ': no estimate, because we don\'t know how it\'s done today.</li>';
+    if (r.skipped === "hours") return '<li class="skip">' + esc(o.l) + ': no estimate, because you weren\'t sure about the hours.</li>';
+    if (r.skipped) return '<li class="skip">' + esc(o.l) + ': no estimate, because we don\'t know how it\'s done today.</li>';
     return '<li>' + fmt(r.hours) + ' hrs/wk of ' + esc(o.s) + ', ' + byV(METHODS, r.method).s + ' → est. ' + rangeText(r) + '</li>';
   }).join("") + '</ul>';
   h += '<details style="margin-top:14px"><summary class="linkbtn" style="list-style:none;display:inline">How this estimate works</summary><p class="note">For each task we take the hours you entered and apply a fixed share based on how it\'s done today. Fully manual: follow-ups and scheduling 40–60%, invoices and paperwork 30–50%, disconnected systems 25–40%. Partly with a tool: half of those. Mostly automated already: 0–10%. Each end of the range is rounded to whole hours, and the total adds up the rounded task ranges. This is not a guarantee: the real number depends on your workflows.</p></details>';
