@@ -356,7 +356,7 @@ function leadBox() {
     '<p class="err" id="leadErr" role="alert"></p>' +
     '<button class="btn" type="submit" id="leadSubmit" style="width:100%;margin-top:4px">' + (call ? "Request my call" : "Send me a copy") + '</button>' +
     '<p class="status" id="leadStatus" role="status"></p>' +
-    '<p class="privacy">Privacy: we use your answers and contact details only to follow up on this audit. We don\'t sell them or share them with advertisers, and we keep them only as long as we need to help you. To see or delete your information, email <a href="mailto:mendel@dayswon.com">mendel@dayswon.com</a>.</p>' +
+    '<p class="privacy">Privacy: we use your answers and contact details only to follow up on this audit. We don\'t sell them or share them with advertisers, and we keep them only as long as we need to help you. To see or delete your information, email <a href="mailto:hello@dayswon.com">hello@dayswon.com</a>.</p>' +
     '</form>';
 }
 function summaryText(d) {
@@ -429,7 +429,7 @@ function submitLead(f) {
     } else {
       b.disabled = false; b.textContent = leadMode === "call" ? "Request my call" : "Send me a copy";
       st.className = "status bad";
-      st.innerHTML = 'That didn\'t go through. Please try again, or email <a href="mailto:mendel@dayswon.com?subject=' + encodeURIComponent("Time Audit " + S.auditId) + '&body=' + encodeURIComponent(payload.message) + '">mendel@dayswon.com</a>.';
+      st.innerHTML = 'That didn\'t go through. Please try again, or email <a href="mailto:hello@dayswon.com?subject=' + encodeURIComponent("Time Audit " + S.auditId) + '&body=' + encodeURIComponent(payload.message) + '">hello@dayswon.com</a>.';
     }
   };
   if (!window.fetch) return done(false);
