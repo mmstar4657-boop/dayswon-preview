@@ -66,4 +66,48 @@ form.addEventListener("submit", function (e) {
     .then(function (r) { return r.json().then(function (j) { return !!(r.ok && j.ok); }); })
     .catch(function () { return false; }).then(done);
 });
+
+/* Busywork Calculator iframe (../time-audit/, loaded unchanged). Same origin, so we hide its own
+   nav/footer, size the frame to its content, and keep each new step in view. */
+(function () {
+  var fr = document.getElementById("calcFrame");
+  if (!fr) return;
+  var lastHead = null, timer = null;
+  function doc() { try { return fr.contentDocument; } catch (e) { return null; } }
+  function fit() {
+    var d = doc(); if (!d || !d.body) return;
+    var h = Math.ceil(d.body.scrollHeight) + 4;
+    if (h > 200 && Math.abs(h - fr.offsetHeight) > 2) fr.style.height = h + "px";
+  }
+  function keepInView() {
+    var d = doc(); if (!d) return;
+    var head = d.querySelector("#app h1, #app h2, main h1, main h2");
+    if (!head) return;
+    if (lastHead && head !== lastHead) {
+      var top = fr.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.6) {
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: top + window.pageYOffset - 84, behavior: reduce ? "auto" : "smooth" });
+      }
+    }
+    lastHead = head;
+  }
+  function setup() {
+    var d = doc(); if (!d || !d.head) return;
+    if (!d.getElementById("embed-style")) {
+      var s = d.createElement("style"); s.id = "embed-style";
+      s.textContent = ".nav,.footer,.skip{display:none!important}html,body{background:#0b1326!important;min-height:0!important;height:auto!important;overflow:hidden!important}.audit-main{min-height:0!important;padding:4px 0 8px!important}.audit-shell{width:100%!important}";
+      d.head.appendChild(s);
+    }
+    fit(); keepInView();
+    var W = fr.contentWindow;
+    if (W.MutationObserver) new W.MutationObserver(function () { fit(); keepInView(); }).observe(d.body, { childList: true, subtree: true, attributes: true });
+    if (W.ResizeObserver) new W.ResizeObserver(fit).observe(d.body);
+    W.addEventListener("resize", fit);
+    clearInterval(timer); timer = setInterval(fit, 1000);
+  }
+  fr.addEventListener("load", setup);
+  if (doc() && doc().readyState === "complete" && doc().URL !== "about:blank") setup();
+  window.addEventListener("resize", fit);
+})();
 })();

@@ -23,15 +23,15 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="stylesheet" href="../styles.css?v=offer2">
-<link rel="stylesheet" href="offer.css?v=offer2">
+<link rel="stylesheet" href="../styles.css?v=offer3">
+<link rel="stylesheet" href="offer.css?v=offer3">
 </head>
 <body class="offer">
 <a class="skip" href="#main">Skip to content</a>
 <div class="pv-bar" role="note">Private preview. Values in dashed boxes, like <span class="ph" title="Placeholder: fill in before publishing">$[X]</span>, are placeholders to fill in.</div>
 <header class="nav"><div class="wrap nav-in">
 <a class="brand" href="../" aria-label="DaysWon home"><svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="16" fill="#3f7bff"/><path d="M18 15.5H31a16.5 16.5 0 0 1 0 33H18Z" fill="none" stroke="#fff" stroke-width="5.6" stroke-linejoin="round"/><path d="M25 32.3l5 5 9.6-10.4" fill="none" stroke="#fff" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Days<em>Won</em></span></a>
-<nav class="nav-links" aria-label="Main"><a href="#offer">The offer</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#time-audit">Time Audit</a><a class="btn sm" href="#book" data-cta="audit" data-track="nav_cta_click"><span class="lg">Book My Free Time Audit</span><span class="xs">Book My Free Audit</span></a></nav>
+<nav class="nav-links" aria-label="Main"><a href="#offer">The offer</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#calculator">Calculator</a><a class="btn sm" href="#book" data-cta="audit" data-track="nav_cta_click"><span class="lg">Book My Free Time Audit</span><span class="xs">Book My Free Audit</span></a></nav>
 </div></header>
 <main id="main">
 
@@ -228,10 +228,16 @@
 </div>
 </section>
 
-<section class="section quiz-sec" id="time-audit" aria-label="Time Audit">
-<div class="audit-shell" id="audit">
-<noscript><p class="intro-card">The Time Audit needs JavaScript. You can also email <a href="mailto:hello@dayswon.com">hello@dayswon.com</a> and tell us where your week goes.</p></noscript>
-<div id="app" data-embed="1" data-share-url="../time-audit/" aria-live="polite"></div>
+<section class="section quiz-sec" id="calculator" aria-labelledby="calc-h">
+<div class="wrap">
+<div class="head calc-head">
+<span class="eyebrow">Busywork Calculator</span>
+<h2 id="calc-h">Find out what busywork is really costing you.</h2>
+</div>
+<div class="calc-frame-wrap">
+<iframe id="calcFrame" class="calc-frame" src="../time-audit/?from=offer" title="Busywork Calculator" loading="lazy"></iframe>
+</div>
+<p class="calc-alt"><a href="../time-audit/">Open the calculator on its own page</a></p>
 </div>
 </section>
 
@@ -241,7 +247,6 @@
 <div><p>Questions? <a href="mailto:hello@dayswon.com">hello@dayswon.com</a></p><p>© <span data-year>2026</span> DaysWon</p></div>
 </div></footer>
 <script src="../track.js"></script>
-<script src="offer.js?v=offer2"></script>
-<script src="../time-audit/audit.js?v=offer2"></script>
+<script src="offer.js?v=offer3"></script>
 </body>
 </html>

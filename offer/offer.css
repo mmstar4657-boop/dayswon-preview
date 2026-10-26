@@ -98,9 +98,12 @@
 .o-form{max-width:680px;margin:0 auto}
 .o-form h2{outline:none}
 .founding-opt{margin-top:16px}
-/* embedded Time Audit (../time-audit/audit.js in embed mode) */
-.quiz-sec{background:var(--bg2);border-top:1px solid var(--line);border-bottom:0;padding:72px 0 88px}
-.quiz-sec .audit-shell{scroll-margin-top:84px}
-.quiz-sec .intro-card h2{font-size:clamp(30px,6vw,44px);margin:10px 0 14px}
+/* Busywork Calculator: ../time-audit/ in a same-origin iframe, sized to its content by offer.js */
+.quiz-sec{background:var(--bg2);border-top:1px solid var(--line);border-bottom:0;padding:72px 0 64px}
+.calc-head{text-align:center;margin:0 auto 18px}
+.calc-frame-wrap{width:min(680px,100%);margin:0 auto}
+.calc-frame{display:block;width:100%;height:900px;border:0;background:var(--bg2)}
+.calc-alt{text-align:center;margin-top:10px;font-size:14px;color:var(--muted)}
+.calc-alt a{color:var(--blue-ink)}
 @media (max-width:560px){.section{padding:68px 0}.o-hero{padding:56px 0 64px}.final{padding:72px 0 56px}}
 .price-v .nw{white-space:nowrap}
