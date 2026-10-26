@@ -1,15 +1,31 @@
-/* DaysWon Time Audit. Plain, deterministic JavaScript: no AI, no third-party trackers.
-   Every number on the results screen comes from the visitor's own answers and the fixed
-   RECOVERY_TABLE below, so each figure can be checked by hand. */
+/* DaysWon Busywork Calculator. Plain, deterministic JavaScript: no AI, no third-party trackers.
+   Every number on the results screen comes from the visitor's own answers (hours chips -> fixed
+   midpoints, hourly value chip) and the fixed RECOVERY_TABLE below, so each figure can be checked by hand.
+   Works standalone (/time-audit/), embedded (<div id="app" data-embed="1">) and inside an iframe. */
 (function(){
 "use strict";
 
-var STORE_KEY = "dw_time_audit_v1";
+/* Booking: leave empty to use the callback form. Paste a calendar link (Calendly, Cal.com...) to switch
+   the "Book My Free Time Audit" button to that link instead. Nothing else needs to change. */
+var BOOKING_URL = "";
+
+var VERSION = "20261026v4";
+var STORE_KEY = "dw_busywork_v1";
 var LEAD_API = "https://dayswon.sites.tab.bot/api/lead";
 var WEEKS_PER_YEAR = 52;
 var TOTAL_STEPS = 6;
 
-/* Conservative share of each task's reported weekly hours that could be won back,
+/* Hours chips and the midpoint each one counts as in the math. */
+var HOUR_BUCKETS = [
+  { v: "u2", l: "Under 2", mid: 1 },
+  { v: "2-5", l: "2–5", mid: 3.5 },
+  { v: "5-10", l: "5–10", mid: 7.5 },
+  { v: "10-20", l: "10–20", mid: 15 },
+  { v: "20p", l: "20+", mid: 25 }
+];
+var RATES = [ { v: 50, l: "$50" }, { v: 100, l: "$100" }, { v: 150, l: "$150" }, { v: 250, l: "$250+" } ];
+
+/* Conservative share of each task's weekly hours that could be won back,
    as [low, high], by how the task is done today. "partial" is exactly half of "manual".
    Rounding: low and high are each rounded to whole hours. If both round to the same value,
    the range is shown as that value to the next whole hour (e.g. 1-2), or as "under 1 hr/wk"
@@ -19,7 +35,6 @@ var RECOVERY_TABLE = {
   partial:   { followups: [0.20, 0.30], scheduling: [0.20, 0.30], paperwork: [0.15, 0.25], systems: [0.125, 0.20] },
   automated: { followups: [0.00, 0.10], scheduling: [0.00, 0.10], paperwork: [0.00, 0.10], systems: [0.00, 0.10] }
 };
-
 var BUSINESS = [
   { v: "field", l: "Field services", d: "Trades, home services, cleaning, landscaping" },
   { v: "realestate", l: "Real estate or lending", d: "Agents, brokers, mortgage and loan officers" },
@@ -95,49 +110,70 @@ var FIXES_BY = {
     systems: { t: "Reports that build themselves", d: "Numbers pulled from your apps into a ready-to-send report, on whatever schedule you need." }
   }
 };
-var INDUSTRY_SOFTWARE = {
-  field: "Field service software (Jobber, ServiceTitan, Housecall Pro)",
-  realestate: "Real estate or loan software (Follow Up Boss, kvCORE, Encompass)",
-  retail: "Store or order software (Shopify, Square, NetSuite)",
-  professional: "Practice software (Clio, Karbon, TaxDome)",
-  other: "Industry software"
+
+/* Tools: tap chips. cats = which fixes a tool plugs into; n = how a fix names it; r = order when named. */
+var COMMON_TOOLS = [
+  { g: "Email and messages", items: [
+    { v: "gmail", l: "Gmail", n: "Gmail", cats: ["followups", "scheduling", "paperwork"], r: 6 },
+    { v: "outlook", l: "Outlook", n: "Outlook", cats: ["followups", "scheduling", "paperwork"], r: 6 },
+    { v: "text", l: "Text or WhatsApp", n: "texts", cats: ["followups", "scheduling"], r: 7 } ] },
+  { g: "Calendar", items: [
+    { v: "gcal", l: "Google Calendar", n: "Google Calendar", cats: ["scheduling"], r: 4 },
+    { v: "calendly", l: "Calendly", n: "Calendly", cats: ["scheduling"], r: 4 } ] },
+  { g: "Money and records", items: [
+    { v: "quickbooks", l: "QuickBooks", n: "QuickBooks", cats: ["paperwork", "systems"], r: 2 },
+    { v: "xero", l: "Xero", n: "Xero", cats: ["paperwork", "systems"], r: 2 },
+    { v: "excel", l: "Excel", n: "Excel", cats: ["paperwork", "systems"], r: 3 },
+    { v: "gsheets", l: "Google Sheets", n: "Google Sheets", cats: ["paperwork", "systems"], r: 3 },
+    { v: "paper", l: "Paper or whiteboard", n: "", paper: true, cats: ["paperwork", "scheduling", "systems"], r: 9 } ] },
+  { g: "CRM", items: [
+    { v: "hubspot", l: "HubSpot", n: "HubSpot", cats: ["followups", "systems"], r: 1 },
+    { v: "salesforce", l: "Salesforce", n: "Salesforce", cats: ["followups", "systems"], r: 1 },
+    { v: "crm", l: "Another CRM", n: "CRM", cats: ["followups", "systems"], r: 1 } ] }
+];
+var INDUSTRY_TOOLS = {
+  field: [ { v: "jobber", l: "Jobber", n: "Jobber", cats: CATS, r: 0 }, { v: "servicetitan", l: "ServiceTitan", n: "ServiceTitan", cats: CATS, r: 0 }, { v: "housecall", l: "Housecall Pro", n: "Housecall Pro", cats: CATS, r: 0 } ],
+  realestate: [ { v: "fub", l: "Follow Up Boss", n: "Follow Up Boss", cats: ["followups", "scheduling", "systems"], r: 0 }, { v: "kvcore", l: "kvCORE", n: "kvCORE", cats: ["followups", "scheduling", "systems"], r: 0 }, { v: "encompass", l: "Encompass", n: "Encompass", cats: ["paperwork", "systems"], r: 0 } ],
+  retail: [ { v: "shopify", l: "Shopify", n: "Shopify", cats: ["followups", "paperwork", "systems"], r: 0 }, { v: "square", l: "Square", n: "Square", cats: ["scheduling", "paperwork", "systems"], r: 0 }, { v: "netsuite", l: "NetSuite", n: "NetSuite", cats: ["paperwork", "systems"], r: 0 } ],
+  professional: [ { v: "clio", l: "Clio", n: "Clio", cats: CATS, r: 0 }, { v: "karbon", l: "Karbon", n: "Karbon", cats: ["followups", "paperwork", "systems"], r: 0 }, { v: "taxdome", l: "TaxDome", n: "TaxDome", cats: ["followups", "paperwork", "systems"], r: 0 } ]
 };
+var NONE_TOOL = { v: "none", l: "Nothing / mostly manual", cats: [] };
+var METHODS = [
+  { v: "manual", l: "By hand" },
+  { v: "partial", l: "Partly with a tool" },
+  { v: "automated", l: "Mostly automated" }
+];
+var GOALS = [
+  { v: "customers", l: "More time with customers", put: "you could spend with your customers instead" },
+  { v: "growth", l: "More time to grow the business", put: "you could put back into growing the business" },
+  { v: "admin", l: "Less admin", put: "of admin you could take off your plate" },
+  { v: "personal", l: "More personal time", put: "you could get back for yourself" }
+];
+var SCOPES = [ { v: "owner", l: "Just me (the owner)" }, { v: "team", l: "My whole team" } ];
+var BEST_TIMES = ["Morning (9-12)", "Midday (12-2)", "Afternoon (2-5)", "Evening (5-7)", "Any time"];
+
 function biz() { return TASKS_BY[S.business] ? S.business : "other"; }
 function taskInfo(t) { var o = TASKS_BY[biz()][t]; return { v: t, l: o.l, s: o.s, d: o.d }; }
 function fixFor(t) { return FIXES_BY[biz()][t]; }
-var TOOL_GROUPS = [
-  { g: "Talking to customers", items: [ { v: "email", l: "Email (Gmail, Outlook)" }, { v: "text", l: "Text or WhatsApp" } ] },
-  { g: "Scheduling", items: [ { v: "calendar", l: "Google Calendar or Calendly" } ] },
-  { g: "Records and money", items: [ { v: "sheets", l: "Excel or Google Sheets" }, { v: "accounting", l: "QuickBooks or Xero" }, { v: "paper", l: "Paper or whiteboard" } ] },
-  { g: "Business software", items: [ { v: "crm", l: "A CRM (HubSpot, Salesforce, other)" }, { v: "industry", l: "Industry software", dyn: true } ] },
-  { g: "", items: [ { v: "none", l: "Nothing / mostly manual" } ] }
-];
-var METHODS = [
-  { v: "manual", l: "Fully manual", s: "done fully manually" },
-  { v: "partial", l: "Partly with a tool", s: "done partly with a tool" },
-  { v: "automated", l: "Mostly automated already", s: "mostly automated already" }
-];
-var GOALS = [
-  { v: "customers", l: "More time with customers" },
-  { v: "growth", l: "More time to grow the business" },
-  { v: "admin", l: "Less admin" },
-  { v: "personal", l: "More personal time" }
-];
-var SCOPES = [ { v: "owner", l: "Just me (the owner)" }, { v: "team", l: "My whole team" } ];
-var COMPANION = { followups: "scheduling", scheduling: "followups", paperwork: "systems", systems: "paperwork" };
-var BEST_TIMES = ["Morning (9-12)", "Midday (12-2)", "Afternoon (2-5)", "Evening (5-7)", "Any time"];
+function toolGroups() {
+  var g = COMMON_TOOLS.slice();
+  if (INDUSTRY_TOOLS[biz()]) g = [{ g: "Your industry software", items: INDUSTRY_TOOLS[biz()] }].concat(g);
+  return g.concat([{ g: "", items: [NONE_TOOL] }]);
+}
+function allTools() { var o = []; toolGroups().forEach(function (g) { o = o.concat(g.items); }); return o; }
+function pickedTools() { var all = allTools(); return S.tools.map(function (v) { return byV(all, v); }).filter(Boolean); }
 
 function track(ev, data) { if (window.track) window.track(ev, data); else try { console.log("[track]", ev, data || {}); } catch (e) {} }
 function byV(list, v) { for (var i = 0; i < list.length; i++) if (list[i].v === v) return list[i]; return null; }
-function toolLabel(o) { return o.dyn ? INDUSTRY_SOFTWARE[biz()] : o.l; }
-function allTools() { var o = []; TOOL_GROUPS.forEach(function (g) { o = o.concat(g.items.map(function (x) { return { v: x.v, l: toolLabel(x) }; })); }); return o; }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 function fmt(n) { return Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10); }
 function num(n) { return n.toLocaleString("en-US"); }
+function money(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
+function andList(a) { return a.length < 2 ? (a[0] || "") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
 
 /* ---------- state ---------- */
 function fresh() {
-  return { step: 0, business: "", tasks: [], hours: {}, notSure: {}, scope: "", tools: [], toolsOther: "", method: {}, goal: "",
+  return { step: 0, business: "", tasks: [], hours: {}, scope: "", method: {}, rate: 0, tools: [], toolsOther: "", goal: "",
            auditId: "", startedAt: "", completedAt: "", lead: null, maxStep: 0 };
 }
 var S = load();
@@ -146,19 +182,17 @@ function load() {
   return fresh();
 }
 function save() { try { sessionStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
-function newId() { return "TA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase(); }
+function newId() { return "BC-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase(); }
 
 /* ---------- calculations ---------- */
-function hoursFor(t) {
-  if (S.notSure[t]) return null;
-  var h = parseFloat(S.hours[t]);
-  return isFinite(h) && h > 0 ? h : null;
-}
+function bucketFor(t) { return byV(HOUR_BUCKETS, S.hours[t]); }
+function hoursFor(t) { var b = bucketFor(t); return b ? b.mid : null; }   /* null = "I'm not sure" or unanswered */
 function reported() {
   var total = 0, known = 0, unsure = [];
   S.tasks.forEach(function (t) { var h = hoursFor(t); if (h === null) unsure.push(t); else { total += h; known++; } });
   total = Math.round(total * 10) / 10;
-  return { weekly: total, yearly: Math.round(total * WEEKS_PER_YEAR * 10) / 10, known: known, unsure: unsure };
+  var yearly = Math.round(total * WEEKS_PER_YEAR * 10) / 10;
+  return { weekly: total, yearly: yearly, known: known, unsure: unsure, rate: S.rate || 0, cost: Math.round(total * (S.rate || 0) * WEEKS_PER_YEAR) };
 }
 function estimateTask(t) {
   var h = hoursFor(t), m = S.method[t];
@@ -176,32 +210,66 @@ function estimate() {
   return { rows: rows, lo: lo, hi: hi, count: n };
 }
 function rangeText(r) { return r.under1 ? "under 1 hr/wk" : r.lo + "–" + r.hi + " hrs/wk"; }
+function winBackText(est) { return est.lo === 0 ? "up to " + est.hi + " hour" + (est.hi === 1 ? "" : "s") : est.lo + "–" + est.hi + " hours"; }
 function pct(x) { return fmt(Math.round(x * 1000) / 10) + "%"; }
+/* Fixes: only for tasks they picked, biggest win-back first, at most 3. No filler. */
 function opportunities(est) {
   var order = S.tasks.slice();
   var score = {}; est.rows.forEach(function (r) { score[r.task] = r.skipped ? -1 : r.hiRaw; });
   order.sort(function (a, b) { return (score[b] - score[a]) || ((hoursFor(b) || 0) - (hoursFor(a) || 0)) || (S.tasks.indexOf(a) - S.tasks.indexOf(b)); });
-  var out = order.slice(0, 3).map(function (t) { return { task: t, picked: true }; });
-  /* fewer than 3 picked: add the closest companions, so there are always 3 concrete fixes */
-  var fill = [COMPANION[order[0]]].concat(CATS);
-  for (var i = 0; i < fill.length && out.length < 3; i++) {
-    var c = fill[i]; if (c && !out.some(function (o) { return o.task === c; })) out.push({ task: c, picked: false });
-  }
-  return out;
+  return order.slice(0, 3).map(function (t) { return { task: t }; });
+}
+/* One sentence per fix that names only tools the visitor picked. */
+function toolLine(task, n) {
+  var picked = pickedTools();
+  if (picked.some(function (o) { return o.v === "none"; })) return "You said it's mostly manual today, so Fix #" + n + " starts from scratch, with nothing to migrate.";
+  var rel = picked.filter(function (o) { return o.cats.indexOf(task) > -1; });
+  var paper = rel.some(function (o) { return o.paper; });
+  var names = rel.filter(function (o) { return !o.paper; }).sort(function (a, b) { return a.r - b.r; }).slice(0, 3).map(function (o) { return o.n; });
+  if (!names.length && !paper) return "";
+  var verb = names.length === 0 ? "gets this off paper and the whiteboard" :
+    (names.length === 1 ? "plugs into your " + names[0] : "connects your " + andList(names)) + (paper ? " and gets the paper out of the loop" : "");
+  var end = { followups: ", so every new lead gets a fast reply and follow-ups go out on their own.",
+              scheduling: ", so bookings, confirmations and reminders happen without the back-and-forth.",
+              paperwork: ", so nothing gets retyped.",
+              systems: ", so information moves on its own instead of being copied by hand." }[task];
+  return "Fix #" + n + " " + verb + end;
 }
 function workWeeks(yearly) { return Math.round(yearly / 40); }
-window.DaysWonAudit = { RECOVERY_TABLE: RECOVERY_TABLE, _state: function () { return S; }, _estimateTask: estimateTask, _reported: reported, _workWeeks: workWeeks, _taskInfo: taskInfo, _fixFor: fixFor, _opportunities: function () { return opportunities(estimate()); } };
+window.DaysWonAudit = { RECOVERY_TABLE: RECOVERY_TABLE, HOUR_BUCKETS: HOUR_BUCKETS, BOOKING_URL: BOOKING_URL, _state: function () { return S; }, _estimate: estimate, _estimateTask: estimateTask, _reported: reported, _workWeeks: workWeeks, _taskInfo: taskInfo, _fixFor: fixFor, _toolLine: toolLine, _opportunities: function () { return opportunities(estimate()); } };
+
+/* ---------- page modes ---------- */
+var app = document.getElementById("app");
+if (!app) return;
+/* Embed mode (used on /offer/): <div id="app" data-embed="1" data-share-url="../time-audit/">. */
+var EMBED = !!app.getAttribute("data-embed");
+var SHARE_URL = app.getAttribute("data-share-url") || "./";
+var FRAMED = false; try { FRAMED = window.self !== window.top; } catch (e) { FRAMED = true; }
+if (FRAMED && !EMBED) document.documentElement.className += " dw-framed";
+/* Load the calculator's own stylesheet next to this script, so embeds get it too. */
+(function () {
+  if (document.querySelector("link[data-dw-audit-css]")) return;
+  var me = document.currentScript || document.querySelector("script[src*='audit.js']");
+  if (!me || !me.src) return;
+  var l = document.createElement("link"); l.rel = "stylesheet"; l.setAttribute("data-dw-audit-css", "1");
+  l.href = me.src.replace(/audit\.js(\?.*)?$/, "audit.css?v=" + VERSION);
+  document.head.appendChild(l);
+})();
+/* In an iframe: tell the parent page our height (message {type:"dayswon-audit:height", height}). */
+function postHeight() {
+  if (!FRAMED) return;
+  try { window.parent.postMessage({ type: "dayswon-audit:height", height: Math.ceil(document.documentElement.scrollHeight) }, "*"); } catch (e) {}
+}
+if (FRAMED) {
+  window.addEventListener("load", postHeight); window.addEventListener("resize", postHeight);
+  if (window.ResizeObserver) try { new ResizeObserver(postHeight).observe(document.body); } catch (e) {}
+}
 
 /* ---------- rendering helpers ---------- */
-var app = document.getElementById("app");
-/* Optional embed mode (used on /offer/): <div id="app" data-embed="1" data-share-url="../time-audit/">.
-   Without these attributes the standalone /time-audit/ page behaves exactly as before. */
-var EMBED = !!(app && app.getAttribute("data-embed"));
-var SHARE_URL = (app && app.getAttribute("data-share-url")) || "./";
 function progress(n) {
   var p = Math.round(n / TOTAL_STEPS * 100);
   return '<div class="prog"><div class="prog-top"><span>Step ' + n + ' of ' + TOTAL_STEPS + '</span><span>' + p + '%</span></div>' +
-    '<div class="bar" role="progressbar" aria-label="Audit progress" aria-valuemin="0" aria-valuemax="' + TOTAL_STEPS + '" aria-valuenow="' + n + '" aria-valuetext="Step ' + n + ' of ' + TOTAL_STEPS + '"><i style="width:' + p + '%"></i></div></div>';
+    '<div class="bar" role="progressbar" aria-label="Calculator progress" aria-valuemin="0" aria-valuemax="' + TOTAL_STEPS + '" aria-valuenow="' + n + '" aria-valuetext="Step ' + n + ' of ' + TOTAL_STEPS + '"><i style="width:' + p + '%"></i></div></div>';
 }
 function radio(name, o, checked) {
   return '<label class="opt"><input type="radio" name="' + name + '" value="' + o.v + '"' + (checked ? " checked" : "") + '><span><span>' + esc(o.l) + (o.d ? '<small>' + esc(o.d) + '</small>' : '') + '</span></span></label>';
@@ -209,11 +277,14 @@ function radio(name, o, checked) {
 function check(name, o, checked) {
   return '<label class="opt"><input type="checkbox" name="' + name + '" value="' + o.v + '"' + (checked ? " checked" : "") + '><span><span>' + esc(o.l) + (o.d ? '<small>' + esc(o.d) + '</small>' : '') + '</span></span></label>';
 }
+function chip(type, name, v, label, checked, extra) {
+  return '<label class="chip"><input type="' + type + '" name="' + name + '" value="' + esc(v) + '"' + (checked ? " checked" : "") + (extra || "") + '><span>' + esc(label) + '</span></label>';
+}
 function stepShell(n, q, help, inner) {
   return progress(n) + '<form id="stepForm" class="step-anim" novalidate>' +
     '<fieldset><legend><h1 class="q" id="qh" tabindex="-1">' + q + '</h1></legend>' + (help ? '<p class="q-help">' + help + '</p>' : '') + inner + '</fieldset>' +
     '<p class="err" id="err" role="alert"></p>' +
-    '<div class="nav-btns"><button type="button" class="btn ghost" id="back">Back</button><button type="submit" class="btn next">' + (n === TOTAL_STEPS ? "See my results" : "Next") + '</button></div></form>';
+    '<div class="nav-btns"><button type="button" class="btn ghost" id="back">Back</button><button type="submit" class="btn next">' + (n === TOTAL_STEPS ? "See my number" : "Next") + '</button></div></form>';
 }
 
 function render(focus) {
@@ -222,155 +293,170 @@ function render(focus) {
   else if (S.step === 1) h = stepShell(1, "What kind of business do you run?", "", '<div class="opts">' + BUSINESS.map(function (o) { return radio("business", o, S.business === o.v); }).join("") + '</div>');
   else if (S.step === 2) h = stepShell(2, "Where does your time disappear?", "Pick all that apply. Tailored to " + esc(byV(BUSINESS, S.business).l.toLowerCase()) + ".", '<div class="opts">' + CATS.map(function (c) { var o = taskInfo(c); return check("tasks", o, S.tasks.indexOf(o.v) > -1); }).join("") + '</div>');
   else if (S.step === 3) h = stepHours();
-  else if (S.step === 4) h = stepTools();
-  else if (S.step === 5) h = stepMethod();
+  else if (S.step === 4) h = stepRate();
+  else if (S.step === 5) h = stepTools();
   else if (S.step === 6) h = stepShell(6, "What would you most like to get back?", "", '<div class="opts">' + GOALS.map(function (o) { return radio("goal", o, S.goal === o.v); }).join("") + '</div>');
   else h = results();
   if (EMBED) h = h.replace(/<h1 /g, "<h2 ").replace(/<\/h1>/g, "</h2>"); /* one h1 per page when embedded */
   app.innerHTML = h;
   bind();
-  if (S.step === TOTAL_STEPS + 1 && reported().known) { countUp(document.querySelector("[data-weekly]"), reported().weekly); countUp(document.querySelector("[data-yearly]"), reported().yearly); }
+  if (S.step === TOTAL_STEPS + 1) {
+    var rep = reported();
+    if (rep.known && rep.rate) countUp(document.querySelector("[data-cost]"), rep.cost, "$");
+  }
   if (focus !== false) {
     var t = document.getElementById("qh");
     if (t) { t.focus({ preventScroll: true }); }
     if (EMBED) { var shell = app.parentNode || app; window.scrollTo(0, Math.max(0, shell.getBoundingClientRect().top + (window.pageYOffset || 0) - 84)); }
     else window.scrollTo(0, 0);
+    if (FRAMED) try { var fe = window.frameElement; if (fe && fe.getBoundingClientRect().top < 0) fe.scrollIntoView({ block: "start" }); } catch (e) {}
   }
+  postHeight();
 }
 
 function intro() {
   var resume = S.maxStep > 0 && S.step === 0;
-  return '<div class="intro-card step-anim"><span class="eyebrow">DaysWon Time Audit</span>' +
-    '<h1 class="q" id="qh" tabindex="-1">How much time could you win back?</h1>' +
-    '<p class="muted">Six quick questions, about 2 minutes. You\'ll see the hours busywork takes each week and each year, a conservative estimate of the time you could win back, and the first three fixes we\'d make for a business like yours. Your results come first. No contact details needed.</p>' +
+  return '<div class="intro-card step-anim"><span class="eyebrow">DaysWon Busywork Calculator</span>' +
+    '<h1 class="q" id="qh" tabindex="-1">Find out what busywork is really costing you.</h1>' +
+    '<p class="intro-sub">2 minutes. Your number, your fixes, no email required.</p>' +
     '<div class="actions">' + (resume ? '<button class="btn" id="resume" type="button">Continue where you left off</button><button class="btn ghost" id="restart" type="button">Start over</button>'
-      : '<button class="btn" id="start" type="button">Start the audit</button>') + '</div></div>';
+      : '<button class="btn" id="start" type="button">Find my number</button>') + '</div></div>';
 }
 
 function stepHours() {
-  var rows = S.tasks.map(function (t) {
-    var o = taskInfo(t), ns = !!S.notSure[t], id = "h_" + t;
-    return '<div class="hrow"><label class="tn" for="' + id + '">' + esc(o.l) + '</label>' +
-      '<span class="hin"><input id="' + id + '" name="h_' + t + '" data-task="' + t + '" type="number" inputmode="decimal" min="0.5" max="100" step="0.5" placeholder="0" value="' + esc(S.hours[t] || "") + '"' + (ns ? " disabled" : "") + ' aria-describedby="u_' + t + '"><span class="u" id="u_' + t + '">hrs / week</span></span>' +
-      '<label class="ns"><input type="checkbox" name="ns_' + t + '" data-task="' + t + '"' + (ns ? " checked" : "") + '>I\'m not sure</label></div>';
+  var cards = S.tasks.map(function (t) {
+    var o = taskInfo(t), cur = S.hours[t] || "", ns = cur === "ns";
+    var hrs = HOUR_BUCKETS.map(function (b) { return chip("radio", "h_" + t, b.v, b.l, cur === b.v); }).join("") + chip("radio", "h_" + t, "ns", "I'm not sure", ns);
+    var meth = METHODS.map(function (m) { return chip("radio", "m_" + t, m.v, m.l, S.method[t] === m.v); }).join("");
+    return '<div class="tcard" id="card_' + t + '" role="group" aria-labelledby="tt_' + t + '"><p class="tcard-t" id="tt_' + t + '">' + esc(o.l) + '</p>' +
+      '<p class="chip-l" id="hl_' + t + '">Hours a week</p><div class="chips hrs" role="radiogroup" aria-labelledby="tt_' + t + ' hl_' + t + '">' + hrs + '</div>' +
+      '<p class="chip-l" id="ml_' + t + '">How it\'s done today' + (ns ? ' <span class="opt-l">(optional)</span>' : '') + '</p><div class="chips meth" role="radiogroup" aria-labelledby="tt_' + t + ' ml_' + t + '">' + meth + '</div></div>';
   }).join("");
   var seg = '<p class="sublabel" id="scope-l">Whose time are you counting?</p><div class="seg" role="radiogroup" aria-labelledby="scope-l">' +
     SCOPES.map(function (o) { return '<label class="opt"><input type="radio" name="scope" value="' + o.v + '"' + (S.scope === o.v ? " checked" : "") + '><span>' + esc(o.l) + '</span></label>'; }).join("") + '</div>';
-  return stepShell(3, "How much time does this take each week?", "Your best guess is fine. Enter hours per week for each task.", seg + '<div class="hours">' + rows + '</div>');
+  return stepShell(3, "How much time does each take a week?", "Tap your best guess for each task.", seg + '<div class="tcards">' + cards + '</div>');
+}
+
+function stepRate() {
+  var team = S.scope === "team";
+  var html = '<div class="chips rate" role="radiogroup" aria-labelledby="qh">' + RATES.map(function (r) { return chip("radio", "rate", r.v, r.l, S.rate === r.v); }).join("") + '</div>';
+  return stepShell(4, team ? "What's an hour of your team's time worth?" : "What's an hour of your time worth?",
+    team ? "A rough average per hour across your team is fine." : "Your best guess. Think of what you bill, or what your time is worth to the business.", html);
 }
 
 function stepTools() {
-  var html = TOOL_GROUPS.map(function (g) {
-    return (g.g ? '<p class="sublabel" style="margin-top:14px">' + esc(g.g) + '</p>' : '<div style="height:14px"></div>') +
-      '<div class="opts">' + g.items.map(function (o) { return check("tools", { v: o.v, l: toolLabel(o) }, S.tools.indexOf(o.v) > -1); }).join("") + '</div>';
+  var html = toolGroups().map(function (g) {
+    return (g.g ? '<p class="chip-l">' + esc(g.g) + '</p>' : '<div style="height:6px"></div>') +
+      '<div class="chips tools">' + g.items.map(function (o) { return chip("checkbox", "tools", o.v, o.l, S.tools.indexOf(o.v) > -1); }).join("") + '</div>';
   }).join("");
-  html += '<div class="fld" style="margin-top:18px"><label for="toolsOther">Other <span class="opt-l">(optional)</span></label><input id="toolsOther" name="toolsOther" type="text" maxlength="200" placeholder="Anything else you use" value="' + esc(S.toolsOther) + '"></div>';
-  return stepShell(4, "What do you use today?", "Pick everything you use to run the work.", html);
-}
-
-function stepMethod() {
-  var html = S.tasks.map(function (t) {
-    var o = taskInfo(t);
-    return '<fieldset style="margin-bottom:18px"><legend class="sublabel">' + esc(o.l) + '</legend><div class="opts">' +
-      METHODS.map(function (m) { return radio("m_" + t, m, S.method[t] === m.v); }).join("") + '</div></fieldset>';
-  }).join("");
-  return stepShell(5, "How is each task done today?", "", html);
+  html += '<div class="fld" style="margin-top:18px"><label for="toolsOther">Something else? <span class="opt-l">(optional)</span></label><input id="toolsOther" name="toolsOther" type="text" maxlength="200" placeholder="Anything else you use" value="' + esc(S.toolsOther) + '"></div>';
+  return stepShell(5, "What do you use today?", "Tap everything you use to run the work.", html);
 }
 
 /* ---------- results ---------- */
-function scopeText() { return S.scope === "team" ? "across your team" : "for you alone"; }
+function scopeText() { return S.scope === "team" ? "across your team" : "for you"; }
 function results() {
-  var rep = reported(), est = estimate(), opps = opportunities(est);
-  var allUnsure = rep.known === 0;
-  var h = '<div class="step-anim"><span class="eyebrow">Your Time Audit results</span>' +
-    (allUnsure ? '<h1 class="q" id="qh" tabindex="-1" style="margin-top:8px">Here\'s where your week goes.</h1>' :
-      '<h1 class="q" id="qh" tabindex="-1" style="margin-top:8px">' + (S.scope === "team" ? "Your team spends " : "You spend ") + '<span class="accent">' + num(rep.weekly) + ' hours a week</span> on busywork.</h1>') +
-    '<p class="q-help">Audit ' + esc(S.auditId) + ' · ' + esc(byV(BUSINESS, S.business).l) + ' · hours ' + scopeText() + '</p>';
+  var rep = reported(), est = estimate(), opps = opportunities(est), goal = byV(GOALS, S.goal);
+  var allUnsure = rep.known === 0, team = S.scope === "team";
+  var h = '<div class="step-anim res"><span class="eyebrow">Your Busywork Calculator results</span>';
 
-  h += '<section class="res-hero" aria-labelledby="rep-h"><h2 class="h-sec" id="rep-h" style="margin-top:0">Reported workload</h2>';
+  /* (a) the big number */
+  h += '<section class="res-hero cost-hero" aria-labelledby="qh">';
   if (allUnsure) {
-    h += '<p style="margin-top:10px">You weren\'t sure about the hours, so we\'re not putting a number on it yet. A short workflow review can measure where the time goes.</p>';
+    h += '<h1 class="q" id="qh" tabindex="-1">Here\'s where your week goes.</h1>' +
+      '<p class="muted" style="margin-top:8px">You weren\'t sure about the hours, so we won\'t guess a number. On a free Time Audit we\'ll measure it with you.</p>';
   } else {
-    h += '<div class="stats"><div class="stat"><div class="v" data-weekly>' + num(rep.weekly) + '<small>hrs / week</small></div><div class="k">Reported weekly hours ' + scopeText() + '</div></div>' +
-      '<div class="stat"><div class="v" data-yearly>' + num(rep.yearly) + '<small>hrs / year</small></div><div class="k">Weekly hours × ' + WEEKS_PER_YEAR + '. <b>Reported workload, not savings.</b></div></div></div>';
-    h += '<p class="workweeks"><span class="ww-n" aria-hidden="true">' + workWeeks(rep.yearly) + '</span><span>That\'s roughly <strong>' + workWeeks(rep.yearly) + ' work week' + (workWeeks(rep.yearly) === 1 ? '' : 's') + ' a year</strong> of reported workload (yearly hours ÷ 40), not time saved.</span></p>';
-    if (rep.unsure.length) h += '<p class="note" style="margin-top:6px">Based on ' + rep.known + ' of ' + S.tasks.length + ' tasks. Not included because you weren\'t sure: ' + rep.unsure.map(function (t) { return taskInfo(t).s; }).join(", ") + '.</p>';
+    h += '<h1 class="cost-h" id="qh" tabindex="-1">Busywork is costing ' + (team ? 'your business' : 'you') + ' about <span class="cost-n" data-cost>' + money(rep.cost) + '</span> a year</h1>' +
+      '<div class="cost-sub"><div class="cs"><b>' + num(rep.weekly) + '</b> hrs a week</div><div class="cs"><b>' + num(rep.yearly) + '</b> hrs a year</div><div class="cs"><b>' + money(rep.rate) + (rep.rate === 250 ? '+' : '') + '</b> an hour</div></div>';
+    if (est.count && goal) h += '<p class="goal-line">That\'s about <strong>' + winBackText(est) + ' a week</strong> ' + esc(goal.put) + '.</p>';
+    h += '<p class="disclaim">Estimate based on your answers. We confirm the real number on a free call. <button type="button" class="linkbtn" id="openHow">How this estimate works</button></p>';
   }
-  h += '<p class="callout">Time spent is not the same as time saved — recoverable hours need a quick workflow review.</p>' +
-    '<p class="res-brand"><span>Days<em>Won</em> Time Audit</span><span>Software that wins back your days.</span></p></section>';
+  h += '<p class="res-brand"><span>Days<em>Won</em> Busywork Calculator</span><span>Software that wins back your days.</span></p></section>';
 
-  h += '<section class="res-hero" aria-labelledby="est-h"><h2 class="h-sec" id="est-h" style="margin-top:0">Estimated time you could win back</h2>';
-  if (est.count === 0) {
-    h += '<p style="margin-top:10px">We can\'t estimate this yet because the hours weren\'t entered. We\'d measure it with you in a free 20-minute workflow review.</p>';
-  } else {
-    h += '<div class="stats" style="grid-template-columns:1fr"><div class="stat"><div class="v" data-est>' + est.lo + '–' + est.hi + '<small>hrs / week</small></div><div class="k"><b>Estimate. We confirm the real number in a free 20-minute workflow review.</b></div></div></div>';
-  }
-  h += '<div class="task-bars" data-est-rows aria-label="Task-by-task hours and estimates">' + est.rows.map(function (r) {
-    var o = taskInfo(r.task), h = hoursFor(r.task), w = rep.weekly ? Math.round((h || 0) / rep.weekly * 100) : 0;
-    var label = '<div class="task-bar-title"><strong>' + esc(o.l) + '</strong><b>' + (h === null ? 'Not sure' : fmt(h) + ' hrs/wk') + '</b></div>';
-    var visual = h === null ? '' : '<div class="task-track" role="img" aria-label="' + esc(o.l) + ': ' + fmt(h) + ' of ' + fmt(rep.weekly) + ' reported weekly hours"><i style="width:' + w + '%"></i></div>';
-    var math = r.skipped ? 'No win-back estimate ' + (r.skipped === "hours" ? '(hours not known).' : '(method not known).') :
-      fmt(r.hours) + ' hrs/wk × ' + pct(r.share[0]) + '–' + pct(r.share[1]) + ' (' + byV(METHODS, r.method).l.toLowerCase() + ') = <strong>est. ' + rangeText(r) + '</strong>';
+  /* (b) their fixes: only for tasks they picked */
+  h += '<h2 class="h-sec">' + (opps.length === 1 ? 'Your fix' : 'Your ' + opps.length + ' fixes') + '</h2><div class="opps">' + opps.map(function (o, i) {
+    var op = fixFor(o.task), tl = toolLine(o.task, i + 1);
+    return '<article class="opp"><div class="t"><h3>' + (i + 1) + '. ' + esc(op.t) + '</h3><span class="from">From: ' + esc(taskInfo(o.task).l) + '</span></div><p>' + esc(op.d) + '</p>' +
+      (tl ? '<p class="tool-line">' + esc(tl) + '</p>' : '') + '</article>';
+  }).join("") + '</div>';
+
+  /* (c) the offer and booking */
+  var bookBtn = BOOKING_URL ? '<a class="btn" id="bookLink" href="' + esc(BOOKING_URL) + '" target="_blank" rel="noopener">Book My Free Time Audit</a>'
+    : '<button class="btn" type="button" data-mode="call">Book My Free Time Audit</button>';
+  h += '<section class="next-step offer-box" aria-labelledby="ns-h"><h2 id="ns-h">Get these hours back</h2>' +
+    '<p class="muted" style="margin-top:6px">Book a free 30-minute Time Audit. We\'ll map your week and show you exactly what we\'d build first.</p>' +
+    '<ul class="promise"><li><strong>Your system goes live in 7 days, or setup is free.</strong></li><li><strong>We work until it works.</strong></li></ul>' +
+    '<p class="spots"><span class="dot" aria-hidden="true"></span>Only a few founding spots left.</p>' +
+    '<div class="actions">' + bookBtn + '<button class="btn ghost" type="button" data-mode="email">Email me a copy</button></div></section>';
+  h += '<div id="leadBox">' + leadBox() + '</div>';
+
+  /* (d) the breakdown and the math, collapsed */
+  h += '<details class="how" id="how"><summary>How this estimate works</summary><div class="how-in">';
+  if (!allUnsure) h += '<p>Yearly cost = weekly hours × your hourly value × ' + WEEKS_PER_YEAR + ': ' + fmt(rep.weekly) + ' × ' + money(rep.rate) + ' × ' + WEEKS_PER_YEAR + ' = <strong>' + money(rep.cost) + '</strong>. Weekly hours add up the middle of each range you tapped (Under 2 = 1, 2–5 = 3.5, 5–10 = 7.5, 10–20 = 15, 20+ = 25)' + (rep.rate === 250 ? '; $250+ counts as $250' : '') + '.</p>';
+  h += '<div class="task-bars" data-est-rows aria-label="Task-by-task breakdown">' + est.rows.map(function (r) {
+    var o = taskInfo(r.task), hh = hoursFor(r.task), b = bucketFor(r.task), w = rep.weekly ? Math.round((hh || 0) / rep.weekly * 100) : 0;
+    var label = '<div class="task-bar-title"><strong>' + esc(o.l) + '</strong><b>' + (hh === null ? 'Not sure' : esc(b.l) + ' hrs/wk') + '</b></div>';
+    var visual = hh === null ? '' : '<div class="task-track" role="img" aria-label="' + esc(o.l) + ': ' + fmt(hh) + ' of ' + fmt(rep.weekly) + ' weekly hours"><i style="width:' + w + '%"></i></div>';
+    var math = hh === null ? 'Not counted (you weren\'t sure).' :
+      'Cost: ' + fmt(hh) + ' hrs/wk × ' + money(rep.rate) + ' × ' + WEEKS_PER_YEAR + ' = <strong>' + money(hh * rep.rate * WEEKS_PER_YEAR) + '/yr</strong><br>' +
+      (r.skipped ? 'Win-back: no estimate (method not given).' : 'Win-back: ' + fmt(r.hours) + ' hrs/wk × ' + pct(r.share[0]) + '–' + pct(r.share[1]) + ' (' + byV(METHODS, r.method).l.toLowerCase() + ') = <strong>' + rangeText(r) + '</strong>');
     return '<div class="task-bar-item">' + label + visual + '<p class="task-math">' + math + '</p></div>';
   }).join("") + '</div>';
-  h += '<details style="margin-top:14px"><summary class="linkbtn" style="list-style:none;display:inline">How this estimate works</summary><p class="note">For each task we take the hours you entered and apply a fixed share based on how it\'s done today. Fully manual: follow-ups and scheduling 40–60%, invoices and paperwork 30–50%, disconnected systems 25–40%. Partly with a tool: half of those. Mostly automated already: 0–10%. Each end of the range is rounded to whole hours, and the total adds up the rounded task ranges. This is not a guarantee: the real number depends on your workflows.</p></details>';
-  h += '</section>';
+  h += '<ul class="how-list">' +
+    '<li>The yearly cost is the time busywork takes now, at the hourly value you picked. Time spent is not the same as time saved.</li>' +
+    '<li>The hours you could get back use one fixed table, by how each task is done today. By hand: follow-ups and scheduling 40–60%, paperwork 30–50%, re-entering data between systems 25–40%. Partly with a tool: half of those. Mostly automated: 0–10%. Each end is rounded to whole hours and the total adds the rounded ranges.</li>' +
+    (rep.unsure.length ? '<li>Not counted because you weren\'t sure: ' + rep.unsure.map(function (t) { return taskInfo(t).s; }).join(", ") + '.</li>' : '') +
+    (team ? '<li>Hours are for your whole team, as you chose.</li>' : '<li>Hours are for you alone, as you chose.</li>') +
+    '<li>This is an estimate, not a guarantee. The real number depends on your workflows, and we confirm it with you on the free Time Audit.</li></ul>';
+  h += '</div></details>';
 
-  h += '<h2 class="h-sec">Three fixes we\'d start with</h2><p class="note">Built around your answers and your industry; we\'d confirm the details together.</p><div class="opps">' + opps.map(function (o, i) {
-    var op = fixFor(o.task);
-    return '<article class="opp"><div class="t"><h3>' + (i + 1) + '. ' + esc(op.t) + '</h3><span class="from">' + (o.picked ? "From: " + esc(taskInfo(o.task).l) : "Often goes with it") + '</span></div><p>' + esc(op.d) + '</p></article>';
-  }).join("") + '</div>';
-
-  h += '<section class="next-step" aria-labelledby="ns-h"><h2 id="ns-h" style="font-size:24px">Recommended next step</h2><p class="muted" style="margin-top:6px">Review these workflows with DaysWon in a free 20-minute call. You\'ll get a clear implementation plan and a real number for the time you could win back.</p>' +
-    '<div class="actions"><button class="btn" type="button" data-mode="call">Book a call</button><button class="btn ghost" type="button" data-mode="email">Email me this report</button></div></section>';
-
-  h += '<div class="share-row"><button class="btn ghost" type="button" id="shareAudit">Share this audit</button><span id="shareStatus" class="share-status" role="status" aria-live="polite"></span></div>';
-  h += '<div id="leadBox">' + leadBox() + '</div>';
+  h += '<div class="share-row"><button class="btn ghost" type="button" id="shareAudit">Share the calculator</button><span id="shareStatus" class="share-status" role="status" aria-live="polite"></span></div>';
   h += '<h2 class="h-sec">Your answers</h2><dl class="summary">' +
     '<dt>Business</dt><dd>' + esc(byV(BUSINESS, S.business).l) + '</dd>' +
-    '<dt>Time goes to</dt><dd>' + S.tasks.map(function (t) { return esc(taskInfo(t).l); }).join(", ") + '</dd>' +
+    '<dt>Time goes to</dt><dd>' + S.tasks.map(function (t) { var b = bucketFor(t); return esc(taskInfo(t).l) + ' (' + (b ? esc(b.l) + ' hrs/wk' : 'not sure') + ')'; }).join(", ") + '</dd>' +
+    '<dt>Hourly value</dt><dd>' + (S.rate ? money(S.rate) + (S.rate === 250 ? '+' : '') : 'Not given') + '</dd>' +
     '<dt>Tools today</dt><dd>' + esc(toolsText()) + '</dd>' +
-    '<dt>Goal</dt><dd>' + esc(byV(GOALS, S.goal).l) + '</dd></dl>';
-  h += '<p style="margin-top:22px"><button type="button" class="linkbtn" id="edit">Change my answers</button> &nbsp;·&nbsp; <button type="button" class="linkbtn" id="restart">Start a new audit</button></p></div>';
+    '<dt>Goal</dt><dd>' + esc(goal ? goal.l : "") + '</dd></dl>';
+  h += '<p style="margin-top:22px"><button type="button" class="linkbtn" id="edit">Change my answers</button> &nbsp;·&nbsp; <button type="button" class="linkbtn" id="restart">Start over</button></p></div>';
   return h;
 }
 function toolsText() {
-  var t = S.tools.map(function (v) { return byV(allTools(), v).l; });
+  var t = pickedTools().map(function (o) { return o.l; });
   if (S.toolsOther.trim()) t.push("Other: " + S.toolsOther.trim());
   return t.join(", ") || "Not given";
 }
 
-/* ---------- lead form ---------- */
+/* ---------- lead form (callback or "email me a copy"; nothing is emailed automatically) ---------- */
 var leadMode = "";
 function leadBox() {
   if (S.lead && S.lead.sent) {
-    return '<div class="done" role="status"><strong>' + (S.lead.mode === "call" ? "Thanks, your call request is in." : "Thanks, your report request is in.") + '</strong> ' +
-      (S.lead.mode === "call" ? "Mendel will call you back at the time you picked." : "Mendel will send you a copy of this report.") + '</div>';
+    return '<div class="done" role="status"><strong>' + (S.lead.mode === "call" ? "Thanks, your Time Audit request is in." : "Thanks, your request is in.") + '</strong> ' +
+      (S.lead.mode === "call" ? "Mendel will call you at the time you picked to set up your free 30-minute Time Audit." : "Mendel will email you a copy of your results.") + '</div>';
   }
   if (!leadMode) return "";
   var call = leadMode === "call";
   return '<form class="lead step-anim" id="leadForm" novalidate>' +
-    '<h2 id="lead-h" tabindex="-1">' + (call ? "Book a call" : "Email me this report") + '</h2>' +
-    '<p class="muted">' + (call ? "Leave your details and Mendel will call you back." : "Leave your email and Mendel will send you a copy of your results.") + '</p>' +
+    '<h2 id="lead-h" tabindex="-1">' + (call ? "Book My Free Time Audit" : "Email me a copy") + '</h2>' +
+    '<p class="muted">' + (call ? "Leave your details and Mendel will call you to set up your free 30-minute Time Audit." : "Leave your email and Mendel will email you a copy of your results.") + '</p>' +
     '<div class="two"><div class="fld"><label for="f_name">Name</label><input id="f_name" name="name" autocomplete="name" required maxlength="120"></div>' +
     '<div class="fld"><label for="f_company">Business name <span class="opt-l">(optional)</span></label><input id="f_company" name="company" autocomplete="organization" maxlength="160"></div></div>' +
     (call ? '<div class="two"><div class="fld"><label for="f_phone">Phone</label><input id="f_phone" name="phone" type="tel" autocomplete="tel" required maxlength="40"></div>' +
       '<div class="fld"><label for="f_time">Best time to call</label><select id="f_time" name="bestTime" required><option value="">Choose a time</option>' + BEST_TIMES.map(function (t) { return '<option>' + t + '</option>'; }).join("") + '</select></div></div>' : '') +
     '<div class="fld"><label for="f_email">Email' + (call ? ' <span class="opt-l">(optional)</span>' : '') + '</label><input id="f_email" name="email" type="email" autocomplete="email"' + (call ? '' : ' required') + ' maxlength="200"></div>' +
     '<div class="hp" aria-hidden="true"><label for="f_website">Website</label><input id="f_website" name="website" tabindex="-1" autocomplete="off"></div>' +
-    '<label class="consent"><input type="checkbox" name="consent" id="f_consent" required><span>I agree that DaysWon may contact me about this audit and keep my answers to do so.</span></label>' +
+    '<label class="consent"><input type="checkbox" name="consent" id="f_consent" required><span>I agree that DaysWon may contact me about my results and keep my answers to do so.</span></label>' +
     '<p class="err" id="leadErr" role="alert"></p>' +
-    '<button class="btn" type="submit" id="leadSubmit" style="width:100%;margin-top:4px">' + (call ? "Request my call" : "Send me a copy") + '</button>' +
+    '<button class="btn" type="submit" id="leadSubmit" style="width:100%;margin-top:4px">' + (call ? "Request my Time Audit" : "Email me a copy") + '</button>' +
     '<p class="status" id="leadStatus" role="status"></p>' +
-    '<p class="privacy">Privacy: we use your answers and contact details only to follow up on this audit. We don\'t sell them or share them with advertisers, and we keep them only as long as we need to help you. To see or delete your information, email <a href="mailto:hello@dayswon.com">hello@dayswon.com</a>.</p>' +
+    '<p class="privacy">Privacy: we use your answers and contact details only to follow up with you. We don\'t sell them or share them with advertisers, and we keep them only as long as we need to help you. To see or delete your information, email <a href="mailto:hello@dayswon.com">hello@dayswon.com</a>.</p>' +
     '</form>';
 }
 function summaryText(d) {
-  var rep = reported(), est = estimate(), opps = opportunities(est);
+  var rep = reported(), est = estimate(), opps = opportunities(est), goal = byV(GOALS, S.goal);
   var L = [];
-  L.push("Source: time-audit");
-  L.push("Request: " + (d.mode === "call" ? "Book a call (best time: " + d.bestTime + ")" : "Email me this report (visitor was told Mendel will send a copy; nothing is sent automatically)"));
-  L.push("Audit ID: " + S.auditId);
+  L.push("Source: time-audit (Busywork Calculator)");
+  L.push("Request: " + (d.mode === "call" ? "Book My Free Time Audit, callback (best time: " + d.bestTime + ")" : "Email me a copy (visitor was told Mendel will email a copy; nothing is sent automatically)"));
+  L.push("Calculator ID: " + S.auditId);
   L.push("Completed: " + S.completedAt + " | Submitted: " + d.at);
   L.push("Consent: yes, given " + d.at);
   L.push("");
@@ -378,29 +464,30 @@ function summaryText(d) {
   if (d.company) L.push("Business name: " + d.company);
   L.push("Tasks: " + S.tasks.map(function (t) { return taskInfo(t).l; }).join(", "));
   L.push("Team scope: " + (S.scope === "team" ? "Whole team" : "Owner only"));
-  L.push("Hours per task (per week) and how it's done today:");
+  L.push("Hours per task (per week, chip -> midpoint used) and how it's done today:");
   S.tasks.forEach(function (t) {
-    var h = hoursFor(t), m = byV(METHODS, S.method[t]);
-    L.push("- " + taskInfo(t).l + " [" + CAT_NAME[t] + "]: " + (h === null ? "not sure" : fmt(h) + " hrs/wk") + ", " + (m ? m.l.toLowerCase() : "method not given"));
+    var b = bucketFor(t), m = byV(METHODS, S.method[t]);
+    L.push("- " + taskInfo(t).l + " [" + CAT_NAME[t] + "]: " + (b ? b.l + " hrs/wk -> " + fmt(b.mid) : "not sure") + ", " + (m ? m.l.toLowerCase() : "method not given"));
   });
+  L.push("Hourly value: " + (S.rate ? "$" + S.rate + (S.rate === 250 ? "+ (counted as $250)" : "") + "/hr" : "not given"));
   L.push("Current tools: " + toolsText());
-  L.push("Desired outcome: " + byV(GOALS, S.goal).l);
+  L.push("Desired outcome: " + (goal ? goal.l : "not given"));
   L.push("");
   if (rep.known === 0) L.push("Weekly total: not given (not sure)");
   else {
-    L.push("Weekly total (reported): " + fmt(rep.weekly) + " hrs/wk" + (rep.unsure.length ? " (" + rep.known + " of " + S.tasks.length + " tasks; not sure on the rest)" : ""));
-    L.push("Annualized total (x" + WEEKS_PER_YEAR + "): " + fmt(rep.yearly) + " hrs/yr (reported workload, not savings)");
-    L.push("Work weeks a year (yearly / 40, reported workload): about " + workWeeks(rep.yearly));
+    L.push("Weekly total: " + fmt(rep.weekly) + " hrs/wk" + (rep.unsure.length ? " (" + rep.known + " of " + S.tasks.length + " tasks; not sure on the rest)" : ""));
+    L.push("Annualized total (x" + WEEKS_PER_YEAR + "): " + fmt(rep.yearly) + " hrs/yr");
+    L.push("Yearly cost shown (weekly hrs x $" + rep.rate + " x " + WEEKS_PER_YEAR + "): " + money(rep.cost) + "/yr");
   }
   if (est.count) {
-    L.push("Estimated time to win back (estimate shown to visitor, to confirm in workflow review): " + est.lo + "-" + est.hi + " hrs/wk");
+    L.push("Estimated hours to win back (shown as an estimate): " + est.lo + "-" + est.hi + " hrs/wk");
     est.rows.forEach(function (r) {
       var o = taskInfo(r.task);
       if (r.skipped) L.push("- " + o.l + ": no estimate (" + (r.skipped === "hours" ? "hours not sure" : "method not given") + ")");
       else L.push("- " + o.l + ": " + fmt(r.hours) + " hrs x " + pct(r.share[0]) + "-" + pct(r.share[1]) + " (" + byV(METHODS, r.method).l.toLowerCase() + ") = " + rangeText(r).replace("–", "-"));
     });
-  } else L.push("Estimated time to win back: not estimated (hours not given)");
-  L.push("Top opportunities: " + opps.map(function (o) { return fixFor(o.task).t; }).join("; "));
+  } else L.push("Estimated hours to win back: not estimated (hours not given)");
+  L.push("Fixes shown: " + opps.map(function (o) { return fixFor(o.task).t; }).join("; "));
   L.push("");
   L.push("Page: " + location.href);
   return L.join("\n");
@@ -423,7 +510,7 @@ function submitLead(f) {
   var payload = {
     type: "inquiry", source: "time-audit",
     name: d.name, email: d.email, phone: d.phone, company: d.company,
-    service: leadMode === "call" ? "Time Audit: book a call" : "Time Audit: email report",
+    service: leadMode === "call" ? "Busywork Calculator: book a free Time Audit" : "Busywork Calculator: email a copy",
     message: summaryText(d), page: location.href, website: v("website")
   };
   var done = function (ok) {
@@ -431,11 +518,11 @@ function submitLead(f) {
     if (ok) {
       S.lead = { sent: true, mode: leadMode, at: d.at }; save();
       track(leadMode === "call" ? "consultation_booked" : "email_requested", { auditId: S.auditId });
-      document.getElementById("leadBox").innerHTML = leadBox();
+      document.getElementById("leadBox").innerHTML = leadBox(); postHeight();
     } else {
-      b.disabled = false; b.textContent = leadMode === "call" ? "Request my call" : "Send me a copy";
+      b.disabled = false; b.textContent = leadMode === "call" ? "Request my Time Audit" : "Email me a copy";
       st.className = "status bad";
-      st.innerHTML = 'That didn\'t go through. Please try again, or email <a href="mailto:hello@dayswon.com?subject=' + encodeURIComponent("Time Audit " + S.auditId) + '&body=' + encodeURIComponent(payload.message) + '">hello@dayswon.com</a>.';
+      st.innerHTML = 'That didn\'t go through. Please try again, or email <a href="mailto:hello@dayswon.com?subject=' + encodeURIComponent("Busywork Calculator " + S.auditId) + '&body=' + encodeURIComponent(payload.message) + '">hello@dayswon.com</a>.';
     }
   };
   if (!window.fetch) return done(false);
@@ -453,14 +540,13 @@ function validate() {
   if (S.step === 3) {
     if (!S.scope) return showErr("Please say whose time you're counting.", f.querySelector("input[name=scope]"));
     for (var i = 0; i < S.tasks.length; i++) {
-      var t = S.tasks[i]; if (S.notSure[t]) continue;
-      var raw = S.hours[t], h = parseFloat(raw), el = document.getElementById("h_" + t);
-      if (raw === "" || raw == null || !isFinite(h)) return showErr("Enter hours for " + taskInfo(t).s + ", or tick \"I'm not sure\".", el);
-      if (h <= 0 || h > 100) return showErr("Hours for " + taskInfo(t).s + " should be between 0.5 and 100 per week.", el);
+      var t = S.tasks[i];
+      if (!S.hours[t]) return showErr("Tap the hours for " + taskInfo(t).s + ", or \"I'm not sure\".", f.querySelector("input[name=h_" + t + "]"));
+      if (S.hours[t] !== "ns" && !S.method[t]) return showErr("Tap how " + taskInfo(t).s + " is done today.", f.querySelector("input[name=m_" + t + "]"));
     }
   }
-  if (S.step === 4 && !S.tools.length && !S.toolsOther.trim()) return showErr("Please pick at least one, or describe it under Other.", f.querySelector("input"));
-  if (S.step === 5) for (var j = 0; j < S.tasks.length; j++) if (!S.method[S.tasks[j]]) return showErr("Please answer for " + taskInfo(S.tasks[j]).s + ".", f.querySelector("input[name=m_" + S.tasks[j] + "]"));
+  if (S.step === 4 && !S.rate) return showErr("Please tap one. A rough guess is fine.", f.querySelector("input"));
+  if (S.step === 5 && !S.tools.length && !S.toolsOther.trim()) return showErr("Please tap at least one, or type it under \"Something else\".", f.querySelector("input"));
   if (S.step === 6 && !S.goal) return showErr("Please choose one option.", f.querySelector("input"));
   return true;
 }
@@ -477,23 +563,23 @@ function next() {
 }
 function start() { if (!S.auditId) S.auditId = newId(); if (!S.startedAt) S.startedAt = new Date().toISOString(); track("audit_start", { auditId: S.auditId }); go(1); }
 
-function countUp(el, target) {
+function countUp(el, target, prefix) {
   if (!el) return;
-  var small = el.querySelector("small"), label = small ? small.outerHTML : "";
-  function show(n) { el.innerHTML = num(n) + label; }
+  prefix = prefix || "";
+  function show(n) { el.textContent = prefix + num(n); }
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { show(target); return; }
-  var start = 0, duration = 900;
+  var t0 = 0, duration = 1000;
   function frame(ts) {
-    if (!start) start = ts;
-    var t = Math.min(1, (ts - start) / duration), eased = 1 - Math.pow(1 - t, 3);
-    show(Number.isInteger(target) ? Math.round(target * eased) : Math.round(target * eased * 10) / 10);
+    if (!t0) t0 = ts;
+    var t = Math.min(1, (ts - t0) / duration), eased = 1 - Math.pow(1 - t, 3);
+    show(Math.round(target * eased));
     if (t < 1) requestAnimationFrame(frame); else show(target);
   }
-  if (window.requestAnimationFrame) { show(0); requestAnimationFrame(frame); } else show(target);
+  if (window.requestAnimationFrame) { show(0); requestAnimationFrame(frame); setTimeout(function () { show(target); }, duration + 400); } else show(target);
 }
 function shareAudit() {
-  var url = new URL(SHARE_URL, location.href).href; /* the audit page only: never an audit ID or answers */
-  var text = "How many hours is busywork costing you? Take the 2-minute DaysWon Time Audit.";
+  var url = new URL(SHARE_URL, location.href).href; /* the calculator page only: never an ID or answers */
+  var text = "What is busywork really costing you? Try the 2-minute DaysWon Busywork Calculator.";
   var st = document.getElementById("shareStatus");
   track("audit_shared", {});
   function copied(ok) { st.textContent = ok ? "Link copied. Paste it anywhere to share." : "Copy this link: " + url; }
@@ -507,7 +593,7 @@ function shareAudit() {
     try { ok = document.execCommand("copy"); } catch (e) {}
     document.body.removeChild(box); copied(ok);
   }
-  if (navigator.share) navigator.share({ title: "DaysWon Time Audit", text: text, url: url }).catch(function (e) { if (!e || e.name !== "AbortError") fallback(); });
+  if (navigator.share) navigator.share({ title: "DaysWon Busywork Calculator", text: text, url: url }).catch(function (e) { if (!e || e.name !== "AbortError") fallback(); });
   else fallback();
 }
 function bind() {
@@ -517,6 +603,9 @@ function bind() {
   if ((el = document.getElementById("resume"))) el.onclick = function () { go(Math.min(S.maxStep, TOTAL_STEPS + 1) || 1); };
   [].forEach.call(document.querySelectorAll("#restart"), function (b) { b.onclick = function () { S = fresh(); leadMode = ""; save(); start(); }; });
   if ((el = document.getElementById("edit"))) el.onclick = function () { go(1); };
+  if ((el = document.getElementById("openHow"))) el.onclick = function () { var d = document.getElementById("how"); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); postHeight(); } };
+  if ((el = document.getElementById("how"))) el.addEventListener("toggle", postHeight);
+  if ((el = document.getElementById("bookLink"))) el.onclick = function () { track("consultation_booked", { auditId: S.auditId, via: "calendar" }); };
   var f = document.getElementById("stepForm");
   if (f) {
     f.onsubmit = function (e) { e.preventDefault(); next(); };
@@ -532,6 +621,7 @@ function bind() {
       lf.onsubmit = function (e) { e.preventDefault(); submitLead(lf); };
       lf.addEventListener("input", function (e) { if (e.target.removeAttribute) e.target.removeAttribute("aria-invalid"); });
       var hd = document.getElementById("lead-h"); hd.focus({ preventScroll: true }); lf.scrollIntoView({ behavior: "smooth", block: "start" });
+      postHeight();
     };
   });
 }
@@ -541,26 +631,27 @@ function onChange(e) {
   if (n === "business") S.business = t.value;
   else if (n === "goal") S.goal = t.value;
   else if (n === "scope") S.scope = t.value;
+  else if (n === "rate") S.rate = parseInt(t.value, 10) || 0;
   else if (n === "tasks") {
     S.tasks = [].map.call(document.querySelectorAll("input[name=tasks]:checked"), function (x) { return x.value; });
   }
-  else if (n.indexOf("h_") === 0) S.hours[t.getAttribute("data-task")] = t.value;
-  else if (n.indexOf("ns_") === 0) {
-    var k = t.getAttribute("data-task"); S.notSure[k] = t.checked;
-    var inp = document.getElementById("h_" + k); inp.disabled = t.checked; if (!t.checked) inp.focus();
+  else if (n.indexOf("h_") === 0) {
+    var k = n.slice(2); S.hours[k] = t.value;
+    var ml = document.getElementById("ml_" + k);
+    if (ml) ml.innerHTML = "How it's done today" + (t.value === "ns" ? ' <span class="opt-l">(optional)</span>' : '');
   }
+  else if (n.indexOf("m_") === 0) S.method[n.slice(2)] = t.value;
   else if (n === "tools") {
     if (t.value === "none" && t.checked) [].forEach.call(document.querySelectorAll("input[name=tools]"), function (x) { if (x.value !== "none") x.checked = false; });
     else if (t.value !== "none" && t.checked) { var nn = document.querySelector("input[name=tools][value=none]"); if (nn) nn.checked = false; }
     S.tools = [].map.call(document.querySelectorAll("input[name=tools]:checked"), function (x) { return x.value; });
   }
   else if (n === "toolsOther") S.toolsOther = t.value;
-  else if (n.indexOf("m_") === 0) S.method[n.slice(2)] = t.value;
   save();
 }
 
 /* sanitize a restored state: steps beyond what's answered fall back */
 if (S.step > TOTAL_STEPS + 1 || S.step < 0) S.step = 0;
-if (S.step === TOTAL_STEPS + 1 && !S.goal) S.step = 0;
+if (S.step === TOTAL_STEPS + 1 && (!S.goal || !S.rate)) S.step = 0;
 render(false);
 })();
